@@ -1,7 +1,6 @@
-/* Custom styles and print stylesheet for Church Financial Log */
+/* Church Financial Log & Stewardship Stylesheet */
 
 @layer utilities {
-  /* Hide scrollbars on overflow tabs */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -11,47 +10,77 @@
   }
 }
 
-/* Print Stylesheet */
+/* Sidebar navigation active style */
+.nav-item.active {
+  background-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+/* Time interval buttons */
+.interval-btn.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Rounded Tithe Date Box styling (Requirement 17) */
+.tithe-day-card {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border-radius: 1.25rem; /* rounded-2xl */
+}
+
+.tithe-day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  border-color: #f59e0b;
+}
+
+.tithe-day-card.has-tithes {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #86efac;
+}
+
+.tithe-day-card.today {
+  border: 2px solid #3b82f6;
+}
+
+/* Print Sheet Styling (Requirement 5) */
 @media print {
   body {
     background: #ffffff !important;
     color: #000000 !important;
   }
 
-  header, footer, nav, .no-print, button, .tab-button {
+  aside, header, #authOverlay, .no-print, button, select {
     display: none !important;
   }
 
-  /* Make the active modal printable */
-  .fixed {
-    position: static !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
+  .page-view {
+    display: block !important;
   }
 
-  #modalStatement, #modalReceipt {
+  #modalPrintReport {
+    position: static !important;
     display: block !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
     box-shadow: none !important;
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
   }
 
-  .shadow-2xl, .shadow-md, .shadow-sm {
+  #printableReportSheet {
+    padding: 0 !important;
+  }
+
+  .shadow-sm, .shadow-md, .shadow-2xl {
     box-shadow: none !important;
   }
 
   .border {
     border-color: #cbd5e1 !important;
   }
-}
-
-/* Transitions */
-.tab-content {
-  transition: opacity 0.15s ease-in-out;
-}
-
-/* Form input focus styles */
-input:focus, select:focus, textarea:focus {
-  outline: none;
 }

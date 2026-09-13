@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stewardly | Church Financial Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div><strong>Stewardly</strong><span>Church financial log</span></div>
+      </div>
+      <div class="workspace-switcher">
+        <div class="avatar">GC</div>
+        <div><strong>Grace Community</strong><span>Finance workspace</span></div>
+        <button aria-label="Switch workspace">⌄</button>
+      </div>
+      <nav>
+        <p class="nav-label">Workspace</p>
+        <button class="nav-item active" data-page="home"><span>⌂</span> Overview</button>
+        <button class="nav-item" data-page="budget"><span>◫</span> Budget</button>
+        <button class="nav-item" data-page="tithe"><span>♡</span> Tithe records</button>
+        <button class="nav-item" data-page="savings"><span>◌</span> Savings</button>
+        <button class="nav-item" data-page="goals"><span>◎</span> Goals</button>
+        <p class="nav-label">Administration</p>
+        <button class="nav-item" data-page="users"><span>♙</span> Edit users</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="security-note"><span>◉</span><div><strong>Private workspace</strong><small>Only delegated users can access</small></div></div>
+        <button class="nav-item sign-out"><span>↪</span> Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" aria-label="Open menu">☰</button>
+        <div class="breadcrumb"><span>Grace Community Church</span><b>/</b><strong id="page-title">Overview</strong></div>
+        <div class="top-actions">
+          <button class="icon-button" title="Notifications">♧<i></i></button>
+          <div class="user-menu"><div class="avatar small">AO</div><span><strong>Angela Owusu</strong><small>Administrator</small></span><span>⌄</span></div>
+        </div>
+      </header>
+
+      <section class="page" id="page-home">
+        <div class="page-heading">
+          <div><p class="eyebrow">Sunday, September 13, 2026</p><h1>Good afternoon, Angela <span>✦</span></h1><p class="subheading">Here is your church's financial pulse at a glance.</p></div>
+          <div class="heading-actions"><button class="button secondary" id="print-report">⇧ <span>Print report</span></button><button class="button primary" id="open-entry">＋ Add entry</button></div>
+        </div>
+        <div class="toolbar"><div class="period-tabs"><button class="selected">This month</button><button>This quarter</button><button>This year</button></div><button class="date-select">September 2026 <span>⌄</span></button></div>
+
+        <div class="budget-alert"><div class="alert-icon">✓</div><div><strong>You're within budget</strong><span>You've used <b>68%</b> of your monthly spending plan. <a href="#" data-page-link="budget">View budget details →</a></span></div><div class="alert-progress"><div style="width:68%"></div></div></div>
+
+        <div class="stat-grid">
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">Total income</span><span class="stat-icon green">↗</span></div><strong class="stat-value">GH₵ 48,250.00</strong><div class="stat-meta positive">↑ 12.8% <span>vs last month</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">Total expenses</span><span class="stat-icon orange">↘</span></div><strong class="stat-value">GH₵ 31,840.50</strong><div class="stat-meta negative">↑ 4.3% <span>vs last month</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">Net balance</span><span class="stat-icon purple">◇</span></div><strong class="stat-value">GH₵ 16,409.50</strong><div class="stat-meta positive">↑ 19.4% <span>vs last month</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">Saved this month</span><span class="stat-icon blue">▣</span></div><strong class="stat-value">GH₵ 5,800.00</strong><div class="stat-meta"><span>Goal progress</span><b>72%</b></div><div class="mini-progress"><div style="width:72%"></div></div></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="card cash-card"><div class="card-heading"><div><h2>Cash position</h2><p>Where your church money is held</p></div><button class="more">•••</button></div><div class="cash-content"><div class="donut"><div><strong>GH₵ 48.2k</strong><span>total liquid</span></div></div><div class="legend"><div><span class="dot teal"></span><div>Cash on hand<small>Physical wallet</small></div><b>GH₵ 12,450</b></div><div><span class="dot purple-dot"></span><div>E-cash wallet<small>Mobile money</small></div><b>GH₵ 20,800</b></div><div><span class="dot gold"></span><div>Sent to bank<small>Bank account</small></div><b>GH₵ 14,000</b></div></div></div></article>
+          <article class="card"><div class="card-heading"><div><h2>Income & expenses</h2><p>Monthly movement</p></div><button class="date-select compact">Last 6 months ⌄</button></div><div class="bar-chart"><div class="y-axis"><span>60k</span><span>40k</span><span>20k</span><span>0</span></div><div class="bars"><div class="bar-group"><i class="income" style="height:76%"></i><i class="expense" style="height:43%"></i><small>Apr</small></div><div class="bar-group"><i class="income" style="height:62%"></i><i class="expense" style="height:49%"></i><small>May</small></div><div class="bar-group"><i class="income" style="height:84%"></i><i class="expense" style="height:57%"></i><small>Jun</small></div><div class="bar-group"><i class="income" style="height:69%"></i><i class="expense" style="height:53%"></i><small>Jul</small></div><div class="bar-group"><i class="income" style="height:92%"></i><i class="expense" style="height:66%"></i><small>Aug</small></div><div class="bar-group current"><i class="income" style="height:80%"></i><i class="expense" style="height:52%"></i><small>Sep</small></div></div></div><div class="chart-key"><span><i class="income-key"></i>Income</span><span><i class="expense-key"></i>Expenses</span></div></article>
+        </div>
+
+        <div class="lower-grid"><article class="card"><div class="card-heading"><div><h2>Recent transactions</h2><p>Your latest entries</p></div><a class="text-link" href="#">View all →</a></div><div class="transaction-list"><div class="transaction"><span class="category-icon violet">⚡</span><div><strong>Electricity bill</strong><small>Utility · Sep 11, 2026</small></div><b class="amount expense-amount">− GH₵ 1,240.00</b><button class="delete-record" data-record="Electricity bill" title="Delete record">×</button></div><div class="transaction"><span class="category-icon mint">♧</span><div><strong>Sunday offering</strong><small>Offering · Sep 10, 2026</small></div><b class="amount income-amount">+ GH₵ 4,850.00</b><button class="delete-record" data-record="Sunday offering" title="Delete record">×</button></div><div class="transaction"><span class="category-icon peach">♜</span><div><strong>Pastor's allowance</strong><small>Staff · Sep 08, 2026</small></div><b class="amount expense-amount">− GH₵ 3,500.00</b><button class="delete-record" data-record="Pastor's allowance" title="Delete record">×</button></div></div></article><article class="card categories-card"><div class="card-heading"><div><h2>Expense breakdown</h2><p>By category this month</p></div><button class="more">•••</button></div><div class="category-row"><span class="category-icon violet">⚡</span><div><strong>Utilities</strong><small>Electricity, water, Wi-Fi</small></div><b>GH₵ 8,420 <small>26%</small></b></div><div class="category-row"><span class="category-icon peach">♜</span><div><strong>Staff & ministry</strong><small>Allowances and support</small></div><b>GH₵ 7,880 <small>25%</small></b></div><div class="category-row"><span class="category-icon gold-bg">⌂</span><div><strong>Facilities</strong><small>Repairs and maintenance</small></div><b>GH₵ 5,620 <small>18%</small></b></div><div class="category-row"><span class="category-icon blue-bg">♧</span><div><strong>Outreach</strong><small>Community programs</small></div><b>GH₵ 4,210 <small>13%</small></b></div></article></div>
+      </section>
+
+      <section class="page hidden" id="page-budget"><div class="page-heading"><div><p class="eyebrow">Planning & control</p><h1>Budget <span>◫</span></h1><p class="subheading">Stay intentional with every cedi entrusted to your church.</p></div><button class="button primary" id="new-budget">＋ Create budget</button></div><div class="budget-summary"><div class="card"><span>Annual plan</span><strong>GH₵ 382,000</strong><small>FY 2026 · 68% allocated</small></div><div class="card"><span>Spent this month</span><strong>GH₵ 31,840</strong><small class="positive">GH₵ 15,160 remaining</small></div><div class="card"><span>Next review</span><strong>Sep 30</strong><small>17 days remaining</small></div></div><article class="card table-card"><div class="card-heading"><div><h2>September spending plan</h2><p>Track each area against its monthly goal</p></div><div class="period-tabs small-tabs"><button class="selected">Monthly</button><button>Quarterly</button><button>Yearly</button></div></div><div class="budget-list"><div class="budget-line"><div class="budget-name"><span class="category-icon violet">⚡</span><div><strong>Utilities</strong><small>Water · Electricity · Wi-Fi</small></div></div><div class="budget-track"><div style="width:72%"></div></div><span>GH₵ 8,420 / 11,700</span><em class="within">Within plan</em></div><div class="budget-line"><div class="budget-name"><span class="category-icon peach">♜</span><div><strong>Staff & ministry</strong><small>Allowances · welfare</small></div></div><div class="budget-track"><div style="width:88%"></div></div><span>GH₵ 7,880 / 8,950</span><em class="warning">Watch closely</em></div><div class="budget-line"><div class="budget-name"><span class="category-icon gold-bg">⌂</span><div><strong>Facilities</strong><small>Repairs · maintenance</small></div></div><div class="budget-track"><div style="width:48%"></div></div><span>GH₵ 5,620 / 11,600</span><em class="within">Within plan</em></div></div></article></section>
+
+      <section class="page hidden" id="page-tithe"><div class="page-heading"><div><p class="eyebrow">Dedicated records</p><h1>Tithe records <span>♡</span></h1><p class="subheading">Record each day's tithe and keep the general ledger in sync.</p></div><button class="button secondary" id="print-tithe">⇧ Print tithe report</button></div><div class="tithe-summary"><div class="card"><span>September tithe</span><strong>GH₵ 18,640</strong><small class="positive">↑ 8.4% from August</small></div><div class="card"><span>E-cash tithe</span><strong>GH₵ 11,980</strong><small>64.3% of total</small></div><div class="card"><span>Physical tithe</span><strong>GH₵ 6,660</strong><small>35.7% of total</small></div></div><article class="card tithe-calendar-card"><div class="card-heading"><div><h2>September 2026</h2><p>Tap a date to add a tithe entry</p></div><div class="calendar-legend"><span><i class="tithe-dot filled"></i> Recorded</span><span><i class="tithe-dot"></i> No entry</span></div></div><div class="tithe-grid" id="tithe-grid"></div></article></section>
+
+      <section class="page hidden" id="page-savings"><div class="page-heading"><div><p class="eyebrow">Building resilience</p><h1>Savings <span>◌</span></h1><p class="subheading">Give tomorrow's needs a place in today's plan.</p></div><button class="button primary" id="new-saving">＋ Add saving</button></div><div class="savings-hero card"><div><span class="eyebrow">Total saved this year</span><strong>GH₵ 42,800.00</strong><p>You've saved 71% of your annual reserve goal.</p></div><div class="savings-ring"><span>71%</span></div></div><div class="savings-grid"><article class="card"><div class="card-heading"><div><h2>Reserve fund</h2><p>Emergency operating reserve</p></div><span class="status-pill green-pill">On track</span></div><strong class="large-number">GH₵ 28,500 <small>/ GH₵ 40,000</small></strong><div class="wide-progress"><i style="width:71%"></i></div><div class="split-meta"><span>GH₵ 2,400 this month</span><span>71% complete</span></div></article><article class="card"><div class="card-heading"><div><h2>Building fund</h2><p>Future expansion project</p></div><span class="status-pill gold-pill">In progress</span></div><strong class="large-number">GH₵ 14,300 <small>/ GH₵ 80,000</small></strong><div class="wide-progress"><i style="width:18%"></i></div><div class="split-meta"><span>GH₵ 3,400 this month</span><span>18% complete</span></div></article></div></section>
+
+      <section class="page hidden" id="page-goals"><div class="page-heading"><div><p class="eyebrow">Purposeful progress</p><h1>Goals <span>◎</span></h1><p class="subheading">Turn your church's vision into measurable milestones.</p></div><button class="button primary" id="new-goal">＋ Add goal</button></div><div class="goals-grid"><article class="goal-card card"><div class="goal-top"><span class="goal-icon violet">⌂</span><span class="status-pill green-pill">On track</span></div><h2>Complete building repairs</h2><p>Replace the roof and refresh the children's wing.</p><div class="goal-amount"><strong>GH₵ 62,500</strong><span>of GH₵ 80,000</span></div><div class="wide-progress"><i style="width:78%"></i></div><small>Due December 2026</small></article><article class="goal-card card"><div class="goal-top"><span class="goal-icon blue-bg">♧</span><span class="status-pill gold-pill">Needs attention</span></div><h2>Community food outreach</h2><p>Support 100 families through the holiday season.</p><div class="goal-amount"><strong>GH₵ 18,200</strong><span>of GH₵ 30,000</span></div><div class="wide-progress orange-progress"><i style="width:61%"></i></div><small>Due November 2026</small></article></div></section>
+
+      <section class="page hidden" id="page-users"><div class="page-heading"><div><p class="eyebrow">Access management</p><h1>Delegated users <span>♙</span></h1><p class="subheading">Keep your financial workspace secure and accountable.</p></div><button class="button primary" id="invite-user">＋ Add user</button></div><article class="card table-card"><div class="card-heading"><div><h2>People with access</h2><p>Only invited team members can view or edit records.</p></div><span class="status-pill green-pill">4 active users</span></div><div class="user-table"><div class="user-row table-header"><span>User</span><span>Role</span><span>Last active</span><span>Status</span><span></span></div><div class="user-row"><div class="person"><div class="avatar">AO</div><div><strong>Angela Owusu</strong><small>angela@gracecommunity.org</small></div></div><span>Administrator</span><span>Just now</span><span class="status-pill green-pill">Active</span><button class="more">•••</button></div><div class="user-row"><div class="person"><div class="avatar mint-avatar">DK</div><div><strong>Daniel Kofi</strong><small>daniel@gracecommunity.org</small></div></div><span>Finance editor</span><span>Today, 09:42</span><span class="status-pill green-pill">Active</span><button class="more">•••</button></div><div class="user-row"><div class="person"><div class="avatar peach-avatar">EM</div><div><strong>Esther Mensah</strong><small>esther@gracecommunity.org</small></div></div><span>Viewer</span><span>Sep 10, 16:18</span><span class="status-pill gray-pill">Invited</span><button class="more">•••</button></div></div></article></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="entry-modal"><div class="modal"><button class="modal-close" data-close>×</button><p class="eyebrow">General ledger</p><h2>Add a financial entry</h2><p class="modal-copy">New records are added to the ledger after your confirmation.</p><form id="entry-form"><label>Entry type<select><option>Income</option><option>Expense</option></select></label><label>Category<select><option>Offering</option><option>Utilities / Electricity</option><option>Staff & ministry</option><option>Outreach</option></select></label><label>Amount<input type="number" placeholder="0.00" required /></label><label>Payment method<select><option>E-cash</option><option>Physical cash</option><option>Bank transfer</option></select></label><label>Description<textarea placeholder="Add details about this entry"></textarea></label><button class="button primary full" type="submit">Save entry</button></form></div></div>
+  <div class="modal-backdrop hidden" id="confirm-modal"><div class="modal confirm-modal"><div class="confirm-icon">?</div><h2>Confirm this change?</h2><p id="confirm-copy">Your entry will be added to the general ledger.</p><div class="modal-actions"><button class="button secondary" data-close>Cancel</button><button class="button primary" id="confirm-action">Confirm & save</button></div></div></div>
+  <div class="toast hidden" id="toast"><span>✓</span><div><strong>Entry saved</strong><small>The general ledger has been updated.</small></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
