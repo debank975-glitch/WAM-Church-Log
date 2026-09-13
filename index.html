@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grace Community Church - Financial Stewardship & Bookkeeping Log</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            church: {
+              50: '#f0f4f8',
+              100: '#d9e2ec',
+              200: '#bcccdc',
+              300: '#9fb3c8',
+              400: '#829ab1',
+              500: '#627d98',
+              600: '#486581',
+              700: '#334e68',
+              800: '#243b53',
+              900: '#102a43',
+              950: '#0b1d30'
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-church-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Church Identity -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gold-500/20 border border-gold-400/40 flex items-center justify-center text-gold-400 font-bold shadow-inner">
+            <i data-lucide="cross" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-lg font-bold tracking-tight text-white" id="headerChurchName">Grace Community Church</h1>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium">Internal Audit Mode</span>
+            </div>
+            <p class="text-xs text-church-300">Financial Stewardship & Accounting Ledger</p>
+          </div>
+        </div>
+
+        <!-- Fiscal Year & Action Buttons -->
+        <div class="flex items-center space-x-3">
+          <div class="hidden md:flex items-center space-x-2 bg-church-800/80 px-3 py-1.5 rounded-lg border border-church-700/60 text-xs text-church-200">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-gold-400"></i>
+            <span>Fiscal Year <strong>2026</strong></span>
+            <span class="text-church-400">|</span>
+            <span id="currentDateStr">Sept 2026</span>
+          </div>
+
+          <button onclick="openModal('modalIncome')" class="inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg font-medium text-xs md:text-sm shadow transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Log Income</span>
+          </button>
+
+          <button onclick="openModal('modalExpense')" class="inline-flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-1.5 rounded-lg font-medium text-xs md:text-sm shadow transition">
+            <i data-lucide="minus-circle" class="w-4 h-4"></i>
+            <span>Log Expense</span>
+          </button>
+
+          <button onclick="openModal('modalBatchCount')" class="hidden sm:inline-flex items-center space-x-1.5 bg-church-700 hover:bg-church-600 text-church-100 px-3 py-1.5 rounded-lg font-medium text-xs md:text-sm border border-church-600 transition" title="Sunday Count Sheet">
+            <i data-lucide="layers" class="w-4 h-4 text-gold-400"></i>
+            <span>Sunday Tally Sheet</span>
+          </button>
+
+          <button onclick="openModal('modalSettings')" class="p-2 rounded-lg bg-church-800 hover:bg-church-700 text-church-300 hover:text-white transition" title="Settings & Data">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Tab Navigation Menu -->
+      <nav class="flex space-x-1 md:space-x-4 border-t border-church-800/80 pt-1 overflow-x-auto no-scrollbar text-sm">
+        <button onclick="switchTab('dashboard')" id="tabBtn-dashboard" class="tab-button active py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-gold-400 text-gold-400">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('income')" id="tabBtn-income" class="tab-button py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-transparent text-church-300 hover:text-white">
+          <i data-lucide="arrow-down-circle" class="w-4 h-4 text-emerald-400"></i>
+          <span>Tithes & Offerings</span>
+        </button>
+        <button onclick="switchTab('expenses')" id="tabBtn-expenses" class="tab-button py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-transparent text-church-300 hover:text-white">
+          <i data-lucide="arrow-up-circle" class="w-4 h-4 text-rose-400"></i>
+          <span>Disbursements</span>
+        </button>
+        <button onclick="switchTab('budgets')" id="tabBtn-budgets" class="tab-button py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-transparent text-church-300 hover:text-white">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i>
+          <span>Department Budgets</span>
+        </button>
+        <button onclick="switchTab('donors')" id="tabBtn-donors" class="tab-button py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-transparent text-church-300 hover:text-white">
+          <i data-lucide="users" class="w-4 h-4 text-amber-400"></i>
+          <span>Donors & Statements</span>
+        </button>
+        <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-button py-2.5 px-3 font-medium text-xs md:text-sm flex items-center space-x-1.5 border-b-2 border-transparent text-church-300 hover:text-white">
+          <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i>
+          <span>Reports & Audit</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ==================== SECTION 1: DASHBOARD ==================== -->
+    <section id="section-dashboard" class="tab-content space-y-6">
+      
+      <!-- Financial Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Total Income Card -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Income (YTD)</span>
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="text-2xl font-bold text-slate-900" id="cardIncomeYTD">$0.00</h3>
+            <div class="mt-1 flex items-center text-xs text-slate-500 space-x-1">
+              <span class="text-emerald-600 font-semibold flex items-center" id="cardIncomeMTD">+$0.00</span>
+              <span>this month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Expenses Card -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Expenses (YTD)</span>
+            <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+              <i data-lucide="trending-down" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="text-2xl font-bold text-slate-900" id="cardExpenseYTD">$0.00</h3>
+            <div class="mt-1 flex items-center text-xs text-slate-500 space-x-1">
+              <span class="text-rose-600 font-semibold" id="cardExpenseMTD">-$0.00</span>
+              <span>this month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Operating Balance -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Net Operating Surplus</span>
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="wallet" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="text-2xl font-bold text-slate-900" id="cardNetOperating">$0.00</h3>
+            <div class="mt-1 flex items-center text-xs text-slate-500">
+              <span id="cardOperatingMargin" class="text-blue-600 font-semibold">0%</span>
+              <span class="ml-1">operating margin</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restricted Dedicated Funds -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Restricted Funds (Building & Missions)</span>
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="text-2xl font-bold text-slate-900" id="cardRestrictedFunds">$0.00</h3>
+            <div class="mt-1 flex items-center text-xs text-slate-500">
+              <span class="text-amber-700 font-medium">Designated & Ring-fenced</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Charts & Visual Analysis Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Cash Flow Bar Chart -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Cash Flow Comparison (Monthly)</h2>
+              <p class="text-xs text-slate-500">Income received vs. Expenses disbursed</p>
+            </div>
+            <div class="flex items-center space-x-3 text-xs">
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-1.5"></span>Income</span>
+              <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-rose-500 mr-1.5"></span>Expense</span>
+            </div>
+          </div>
+          <div class="h-64 relative">
+            <canvas id="chartCashFlow"></canvas>
+          </div>
+        </div>
+
+        <!-- Income by Fund Doughnut Chart -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">Income by Fund Category</h2>
+                <p class="text-xs text-slate-500">Tithes, offerings & special gifts</p>
+              </div>
+            </div>
+            <div class="h-56 relative flex items-center justify-center">
+              <canvas id="chartFundDistribution"></canvas>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600" id="fundLegendCompact">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recent Financial Activity Table & Quick Tally Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Combined Recent Activity -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Recent Financial Transactions</h2>
+              <p class="text-xs text-slate-500">Latest recorded income contributions and disbursements</p>
+            </div>
+            <button onclick="switchTab('income')" class="text-xs text-church-600 hover:text-church-900 font-semibold">
+              View All &rarr;
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                <tr>
+                  <th class="py-2.5 px-3">Date</th>
+                  <th class="py-2.5 px-3">Type</th>
+                  <th class="py-2.5 px-3">Donor / Payee</th>
+                  <th class="py-2.5 px-3">Fund / Category</th>
+                  <th class="py-2.5 px-3">Method</th>
+                  <th class="py-2.5 px-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentRows" class="divide-y divide-slate-100 font-medium">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sunday Stewardship Quick Summary Widget -->
+        <div class="bg-gradient-to-br from-church-900 to-church-800 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-church-700/60">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="church" class="w-5 h-5 text-gold-400"></i>
+                <h3 class="font-bold text-sm">Last Sunday Service Tally</h3>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-gold-400/20 text-gold-300 font-mono">Count Verified</span>
+            </div>
+
+            <div class="mt-4 space-y-3 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-church-800">
+                <span class="text-church-300">Sunday 1st Service:</span>
+                <span class="font-bold text-white" id="widgetSunday1st">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-church-800">
+                <span class="text-church-300">Sunday 2nd Service:</span>
+                <span class="font-bold text-white" id="widgetSunday2nd">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-church-800">
+                <span class="text-church-300">Midweek / Online Giving:</span>
+                <span class="font-bold text-white" id="widgetOnlineGiving">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-2 bg-church-800/60 px-3 rounded-lg mt-2">
+                <span class="text-gold-300 font-semibold">Weekly Total:</span>
+                <span class="font-bold text-emerald-400 text-sm" id="widgetWeeklyTotal">$0.00</span>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-church-950/40 rounded-xl border border-church-700/50 text-xs text-church-300 space-y-1">
+              <div class="flex items-center space-x-1.5 text-gold-400 font-semibold">
+                <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                <span>Dual-Control Internal Check</span>
+              </div>
+              <p class="text-[11px] leading-relaxed text-church-300">
+                All physical cash and envelope offerings require signatures of at least two authorized counting committee trustees before bank deposit.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <button onclick="openModal('modalBatchCount')" class="w-full py-2 bg-gold-500 hover:bg-gold-400 text-church-950 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+              <span>Launch Sunday Counting Sheet</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== SECTION 2: INCOME & CONTRIBUTIONS ==================== -->
+    <section id="section-income" class="tab-content hidden space-y-5">
+      
+      <!-- Control Header -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Income & Contribution Log</h2>
+          <p class="text-xs text-slate-500">Record tithes, sunday collections, building fund, pledges & special gifts</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="openModal('modalBatchCount')" class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition">
+            <i data-lucide="calculator" class="w-4 h-4 text-slate-600"></i>
+            <span>Sunday Tally Sheet</span>
+          </button>
+          
+          <button onclick="exportToCSV('income')" class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition">
+            <i data-lucide="download" class="w-4 h-4 text-slate-600"></i>
+            <span>Export CSV</span>
+          </button>
+
+          <button onclick="openModal('modalIncome')" class="inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Record Contribution</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Search Donor / Receipt #</label>
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+            <input type="text" id="filterIncomeSearch" oninput="renderIncomeTable()" placeholder="e.g. Miller or REC-..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Fund Category</label>
+          <select id="filterIncomeFund" onchange="renderIncomeTable()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="ALL">All Funds & Offerings</option>
+            <option value="Tithes">Tithes (10%)</option>
+            <option value="General Offering">General Offering</option>
+            <option value="Building Fund">Building & Capital Fund</option>
+            <option value="Missions">Missions & Evangelism</option>
+            <option value="Benevolence">Benevolence & Welfare</option>
+            <option value="Youth Ministry">Youth & Children</option>
+            <option value="Special Thanksgiving">Special Thanksgiving</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Payment Channel</label>
+          <select id="filterIncomeMethod" onchange="renderIncomeTable()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="ALL">All Payment Methods</option>
+            <option value="Cash">Cash Currency</option>
+            <option value="Check">Personal Check</option>
+            <option value="Online / Card">Online / Card (Stripe/Tithe.ly)</option>
+            <option value="Bank Transfer">Direct Bank Transfer / Wire</option>
+            <option value="Mobile Money">Mobile (Zelle/MoMo/CashApp)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Service / Event</label>
+          <select id="filterIncomeService" onchange="renderIncomeTable()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="ALL">All Services</option>
+            <option value="Sunday 1st Service">Sunday 1st Service</option>
+            <option value="Sunday 2nd Service">Sunday 2nd Service</option>
+            <option value="Midweek Service">Midweek Prayer & Bible Study</option>
+            <option value="Special Conference">Special Revival / Conference</option>
+            <option value="Direct / Mail">Direct / Mail / Online</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Income Ledger Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Receipt / ID</th>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Donor Name & Env #</th>
+                <th class="py-3 px-4">Fund Category</th>
+                <th class="py-3 px-4">Service</th>
+                <th class="py-3 px-4">Method & Ref</th>
+                <th class="py-3 px-4 text-right">Amount</th>
+                <th class="py-3 px-4 text-center">Receipt</th>
+                <th class="py-3 px-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTableBody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="incomeEmptyState" class="hidden py-12 text-center">
+          <i data-lucide="folder-open" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+          <p class="text-sm font-semibold text-slate-600">No income records match current filters</p>
+          <p class="text-xs text-slate-400">Try adjusting your search criteria or log a new gift.</p>
+        </div>
+
+        <!-- Table Footer Summary -->
+        <div class="bg-slate-50/80 p-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-600 gap-2">
+          <div id="incomeCountSummary">Showing 0 records</div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-slate-800">Filtered Total:</span>
+            <span class="text-sm font-extrabold text-emerald-600" id="incomeFilteredTotal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SECTION 3: EXPENSES & DISBURSEMENTS ==================== -->
+    <section id="section-expenses" class="tab-content hidden space-y-5">
+      
+      <!-- Control Header -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Expenses & Ministry Disbursements</h2>
+          <p class="text-xs text-slate-500">Track operations, facilities, pastoral compensation, and ministry budgets</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="exportToCSV('expense')" class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition">
+            <i data-lucide="download" class="w-4 h-4 text-slate-600"></i>
+            <span>Export CSV</span>
+          </button>
+
+          <button onclick="openModal('modalExpense')" class="inline-flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Record Expense</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Search Payee / Voucher #</label>
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+            <input type="text" id="filterExpenseSearch" oninput="renderExpenseTable()" placeholder="e.g. Electric Co or EXP-..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Ministry Department</label>
+          <select id="filterExpenseDept" onchange="renderExpenseTable()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white">
+            <option value="ALL">All Departments</option>
+            <option value="Pastoral & Staff">Pastoral & Staff</option>
+            <option value="Facilities & Utilities">Facilities & Utilities</option>
+            <option value="Audio, Visual & Media">Audio, Visual & Media</option>
+            <option value="Missions & Outreach">Missions & Outreach</option>
+            <option value="Youth & Sunday School">Youth & Sunday School</option>
+            <option value="Worship & Instruments">Worship & Instruments</option>
+            <option value="Administration & Operations">Administration & Operations</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Approval Status</label>
+          <select id="filterExpenseStatus" onchange="renderExpenseTable()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white">
+            <option value="ALL">All Statuses</option>
+            <option value="Approved">Approved & Paid</option>
+            <option value="Pending">Pending Approval</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Expense Ledger Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Voucher #</th>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Payee / Vendor</th>
+                <th class="py-3 px-4">Department</th>
+                <th class="py-3 px-4">Description</th>
+                <th class="py-3 px-4">Method & Ref</th>
+                <th class="py-3 px-4">Approved By</th>
+                <th class="py-3 px-4 text-right">Amount</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="expenseEmptyState" class="hidden py-12 text-center">
+          <i data-lucide="receipt" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+          <p class="text-sm font-semibold text-slate-600">No expense records match current filters</p>
+          <p class="text-xs text-slate-400">Try adjusting your filters or record an expense voucher.</p>
+        </div>
+
+        <!-- Table Footer Summary -->
+        <div class="bg-slate-50/80 p-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-600 gap-2">
+          <div id="expenseCountSummary">Showing 0 records</div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-slate-800">Filtered Disbursements:</span>
+            <span class="text-sm font-extrabold text-rose-600" id="expenseFilteredTotal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SECTION 4: DEPARTMENT BUDGETS ==================== -->
+    <section id="section-budgets" class="tab-content hidden space-y-5">
+      
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Departmental Annual Budgets vs Actuals</h2>
+          <p class="text-xs text-slate-500">Monitor budget variance and ensure disciplined church stewardship</p>
+        </div>
+        <button onclick="openModal('modalEditBudgets')" class="inline-flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow transition">
+          <i data-lucide="sliders" class="w-4 h-4 text-gold-400"></i>
+          <span>Configure Department Budgets</span>
+        </button>
+      </div>
+
+      <!-- Budget Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="budgetCardsGrid">
+        <!-- Dynamically injected -->
+      </div>
+
+    </section>
+
+    <!-- ==================== SECTION 5: DONORS & GIVING STATEMENTS ==================== -->
+    <section id="section-donors" class="tab-content hidden space-y-5">
+      
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Church Members & Giving Roll</h2>
+          <p class="text-xs text-slate-500">Maintain donor records and generate tax-deductible contribution statements</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="openModal('modalAddDonor')" class="inline-flex items-center space-x-1.5 bg-church-800 hover:bg-church-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow transition">
+            <i data-lucide="user-plus" class="w-4 h-4 text-gold-400"></i>
+            <span>Add Member / Donor</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Member Donors Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+          <div class="relative w-full max-w-xs text-xs">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+            <input type="text" id="filterDonorSearch" oninput="renderDonorsTable()" placeholder="Search by name, envelope #, or email..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-church-600">
+          </div>
+          <span class="text-xs text-slate-500 font-medium" id="donorCountBadge">0 registered members</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Env #</th>
+                <th class="py-3 px-4">Member / Donor Name</th>
+                <th class="py-3 px-4">Contact Info</th>
+                <th class="py-3 px-4 text-right">Tithes Given</th>
+                <th class="py-3 px-4 text-right">Special Funds</th>
+                <th class="py-3 px-4 text-right">Total Giving (YTD)</th>
+                <th class="py-3 px-4 text-center">Tax Statement</th>
+              </tr>
+            </thead>
+            <tbody id="donorsTableBody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SECTION 6: REPORTS & AUDIT TRAIL ==================== -->
+    <section id="section-reports" class="tab-content hidden space-y-6">
+      
+      <!-- Quick Report Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <i data-lucide="newspaper" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Sunday Bulletin Financial Slip</h3>
+            <p class="text-xs text-slate-500 mt-1">Printable weekly financial disclosure slip for congregation transparency in the Sunday bulletin.</p>
+          </div>
+          <button onclick="generateBulletinReport()" class="mt-4 w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg text-xs transition flex items-center justify-center space-x-1.5">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>Preview Bulletin Slip</span>
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+              <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Monthly Treasurer's Board Report</h3>
+            <p class="text-xs text-slate-500 mt-1">Formal monthly Income & Expense Statement for presentation to the Deacon Board or Finance Committee.</p>
+          </div>
+          <button onclick="generateBoardReport()" class="mt-4 w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-lg text-xs transition flex items-center justify-center space-x-1.5">
+            <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+            <span>Preview Board Report</span>
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+              <i data-lucide="database" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Complete Data Export & Ledger</h3>
+            <p class="text-xs text-slate-500 mt-1">Export full CSV audit package with income, disbursements, and internal dual-verification signatures.</p>
+          </div>
+          <div class="mt-4 flex space-x-2">
+            <button onclick="exportToCSV('income')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition">
+              Income CSV
+            </button>
+            <button onclick="exportToCSV('expense')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition">
+              Expense CSV
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Audit Trail Log Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield-alert" class="w-5 h-5 text-church-700"></i>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">System Audit Trail & Verification Log</h3>
+              <p class="text-xs text-slate-500">Immutable chronological log of entries, modifications, and count-sheet verifications</p>
+            </div>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-100 text-slate-600 font-mono" id="auditLogCount">0 entries</span>
+        </div>
+
+        <div class="overflow-x-auto max-h-96">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0">
+              <tr>
+                <th class="py-2.5 px-4">Timestamp</th>
+                <th class="py-2.5 px-4">Operator / Trustee</th>
+                <th class="py-2.5 px-4">Action Type</th>
+                <th class="py-2.5 px-4">Details & Reference</th>
+              </tr>
+            </thead>
+            <tbody id="auditTrailBody" class="divide-y divide-slate-100 font-mono text-[11px]">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-xs text-slate-500 text-center">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-600"></i>
+        <span>Financial records stored locally in browser session & local storage. Compliant with Church Internal Controls.</span>
+      </div>
+      <div>
+        <span>Grace Community Church Financial Log &copy; 2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL: LOG INCOME -->
+  <div id="modalIncome" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="font-bold text-sm">Record Contribution / Tithe</h3>
+        </div>
+        <button onclick="closeModal('modalIncome')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formIncome" onsubmit="handleIncomeSubmit(event)" class="p-6 space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Date *</label>
+            <input type="date" id="incDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Service / Event *</label>
+            <select id="incService" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="Sunday 1st Service">Sunday 1st Service</option>
+              <option value="Sunday 2nd Service">Sunday 2nd Service</option>
+              <option value="Midweek Service">Midweek Service</option>
+              <option value="Special Conference">Special Revival / Conference</option>
+              <option value="Direct / Mail">Direct Mail / Online</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Donor Name *</label>
+            <input type="text" id="incDonorName" placeholder="e.g. Johnathan Edwards" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Envelope # (Optional)</label>
+            <input type="text" id="incEnvNum" placeholder="e.g. 104" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Fund Category *</label>
+            <select id="incFund" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="Tithes">Tithes (10%)</option>
+              <option value="General Offering">General Offering</option>
+              <option value="Building Fund">Building & Capital Fund</option>
+              <option value="Missions">Missions & Outreach</option>
+              <option value="Benevolence">Benevolence / Welfare</option>
+              <option value="Youth Ministry">Youth & Children Ministry</option>
+              <option value="Special Thanksgiving">Special Thanksgiving Seed</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Amount ($) *</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+              <input type="number" step="0.01" min="0.01" id="incAmount" required placeholder="0.00" class="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 font-bold text-slate-900">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Payment Method *</label>
+            <select id="incMethod" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="Cash">Cash</option>
+              <option value="Check">Check</option>
+              <option value="Online / Card">Online / Card (Stripe/Tithe.ly)</option>
+              <option value="Bank Transfer">Bank Transfer / Wire</option>
+              <option value="Mobile Money">Mobile (Zelle/MoMo/CashApp)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Reference / Check #</label>
+            <input type="text" id="incRef" placeholder="e.g. Check #4028" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Notes / Specific Intention</label>
+          <input type="text" id="incNotes" placeholder="e.g. In memory of Sarah, youth camp pledge, etc." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalIncome')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow">Save Contribution</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG EXPENSE -->
+  <div id="modalExpense" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="minus-circle" class="w-5 h-5 text-rose-400"></i>
+          <h3 class="font-bold text-sm">Record Expense / Disbursement Voucher</h3>
+        </div>
+        <button onclick="closeModal('modalExpense')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formExpense" onsubmit="handleExpenseSubmit(event)" class="p-6 space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Date *</label>
+            <input type="date" id="expDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Ministry Department *</label>
+            <select id="expDept" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white">
+              <option value="Pastoral & Staff">Pastoral & Staff Compensation</option>
+              <option value="Facilities & Utilities">Facilities & Utilities (Power, Water, Gas)</option>
+              <option value="Audio, Visual & Media">Audio, Visual & Media Tech</option>
+              <option value="Missions & Outreach">Missions & Evangelism Outreach</option>
+              <option value="Youth & Sunday School">Youth & Sunday School Materials</option>
+              <option value="Worship & Instruments">Worship & Music Department</option>
+              <option value="Administration & Operations">Administration & Office Operations</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Payee / Vendor Name *</label>
+            <input type="text" id="expPayee" placeholder="e.g. City Power & Electric" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Amount ($) *</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+              <input type="number" step="0.01" min="0.01" id="expAmount" required placeholder="0.00" class="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 font-bold text-slate-900">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Payment Method *</label>
+            <select id="expMethod" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white">
+              <option value="Church Check">Church Check</option>
+              <option value="Bank EFT / Wire">Bank EFT / Direct Wire</option>
+              <option value="Credit Card">Church Debit/Credit Card</option>
+              <option value="Petty Cash">Petty Cash</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Check / Invoice #</label>
+            <input type="text" id="expRef" placeholder="e.g. Check #1820 or Inv #991" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Approved By (Internal Control) *</label>
+            <input type="text" id="expApprovedBy" placeholder="e.g. Pastor David / Elder Board" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Approval Status *</label>
+            <select id="expStatus" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white">
+              <option value="Approved">Approved & Disbursed</option>
+              <option value="Pending">Pending Trustee Approval</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Expense Description / Purpose</label>
+          <input type="text" id="expDesc" placeholder="e.g. Monthly sanctuary electricity and heating bill" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500">
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalExpense')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg shadow">Post Voucher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUNDAY TALLY SHEET (DUAL COUNT VERIFICATION) -->
+  <div id="modalBatchCount" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="layers" class="w-5 h-5 text-gold-400"></i>
+          <div>
+            <h3 class="font-bold text-sm">Sunday Collection Counting Sheet</h3>
+            <p class="text-[11px] text-church-300">Dual-counter physical currency verification sheet</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalBatchCount')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Service Date</label>
+            <input type="date" id="tallyDate" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Service Type</label>
+            <select id="tallyService" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white">
+              <option value="Sunday 1st Service">Sunday 1st Service</option>
+              <option value="Sunday 2nd Service">Sunday 2nd Service</option>
+              <option value="Midweek Service">Midweek Service</option>
+              <option value="Special Conference">Special Revival</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Fund Allocation</label>
+            <select id="tallyFund" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white">
+              <option value="General Offering">General Offering</option>
+              <option value="Building Fund">Building Fund</option>
+              <option value="Missions">Missions & Evangelism</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Denomination Counter Grid -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="font-bold text-slate-700">Cash Currency Breakdown</span>
+            <span class="text-emerald-700 font-mono font-bold" id="tallyCashTotalDisplay">Cash Total: $0.00</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$100 Bills</label>
+              <input type="number" min="0" value="0" id="bill100" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$50 Bills</label>
+              <input type="number" min="0" value="0" id="bill50" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$20 Bills</label>
+              <input type="number" min="0" value="0" id="bill20" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$10 Bills</label>
+              <input type="number" min="0" value="0" id="bill10" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$5 Bills</label>
+              <input type="number" min="0" value="0" id="bill5" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">$1 Bills</label>
+              <input type="number" min="0" value="0" id="bill1" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">Coins / Change ($)</label>
+              <input type="number" step="0.01" min="0" value="0.00" id="coinTotal" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-500 font-semibold">Checks Total ($)</label>
+              <input type="number" step="0.01" min="0" value="0.00" id="checksTotal" oninput="calculateTallySheet()" class="w-full px-2 py-1 border border-slate-300 rounded text-right font-mono font-bold text-blue-700">
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Sign-off -->
+        <div class="grid grid-cols-2 gap-3 p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl">
+          <div>
+            <label class="block font-semibold text-amber-900 mb-1">First Counter (Trustee 1) *</label>
+            <input type="text" id="tallyCounter1" placeholder="e.g. Deacon Robert Vance" required class="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg bg-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-amber-900 mb-1">Second Counter (Trustee 2) *</label>
+            <input type="text" id="tallyCounter2" placeholder="e.g. Elder Martha Clark" required class="w-full px-2.5 py-1.5 border border-amber-300 rounded-lg bg-white">
+          </div>
+        </div>
+
+        <!-- Grand Total Banner -->
+        <div class="p-4 bg-church-900 text-white rounded-xl flex items-center justify-between">
+          <div>
+            <span class="text-xs text-church-300 uppercase tracking-wider block">Grand Deposit Total</span>
+            <span class="text-2xl font-black text-gold-400 font-mono" id="tallyGrandTotal">$0.00</span>
+          </div>
+          <button onclick="commitSundayTallySheet()" class="px-5 py-2.5 bg-gold-500 hover:bg-gold-400 text-church-950 font-bold rounded-lg shadow text-xs flex items-center space-x-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Commit & Log Collection</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RECEIPT VIEWER / PRINTABLE TICKET -->
+  <div id="modalReceipt" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in">
+      <div class="p-6" id="receiptContent">
+        <!-- Receipt template rendered via JS -->
+      </div>
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end space-x-2 text-xs">
+        <button onclick="closeModal('modalReceipt')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg">Close</button>
+        <button onclick="printReceipt()" class="px-4 py-2 bg-church-900 hover:bg-church-800 text-white font-semibold rounded-lg flex items-center space-x-1.5">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+          <span>Print Receipt</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DONOR ANNUAL GIVING STATEMENT (IRS 501(c)(3) FORMAT) -->
+  <div id="modalStatement" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-slate-200 my-8">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between no-print">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="file-check" class="w-5 h-5 text-gold-400"></i>
+          <h3 class="font-bold text-sm">Annual Charitable Contribution Statement</h3>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="printStatement()" class="px-3 py-1.5 bg-gold-500 hover:bg-gold-400 text-church-950 font-bold rounded-lg text-xs flex items-center space-x-1">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>Print / Save PDF</span>
+          </button>
+          <button onclick="closeModal('modalStatement')" class="text-church-300 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-8 space-y-6 text-slate-800" id="statementPrintableArea">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT DEPARTMENT BUDGETS -->
+  <div id="modalEditBudgets" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-sm">Adjust Department Budgets</h3>
+        <button onclick="closeModal('modalEditBudgets')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="formEditBudgets" onsubmit="saveDepartmentBudgets(event)" class="p-6 space-y-3 text-xs max-h-[70vh] overflow-y-auto" id="budgetInputsContainer">
+        <!-- Injected dynamically -->
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD MEMBER / DONOR -->
+  <div id="modalAddDonor" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-sm">Register Member / Donor</h3>
+        <button onclick="closeModal('modalAddDonor')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="formAddDonor" onsubmit="handleAddDonorSubmit(event)" class="p-6 space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Full Member Name *</label>
+          <input type="text" id="donorNewName" required placeholder="e.g. Deacon David Williams" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Envelope #</label>
+            <input type="text" id="donorNewEnv" placeholder="e.g. 109" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+            <input type="text" id="donorNewPhone" placeholder="(555) 019-2834" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="donorNewEmail" placeholder="member@example.org" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Mailing Address (For Annual Statement)</label>
+          <input type="text" id="donorNewAddress" placeholder="123 Faith Lane, Springfield, IL" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalAddDonor')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-church-800 hover:bg-church-700 text-white font-bold rounded-lg">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS & DATA MANAGEMENT -->
+  <div id="modalSettings" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="settings" class="w-5 h-5 text-gold-400"></i>
+          <h3 class="font-bold text-sm">Church Financial Settings & Ledger Backup</h3>
+        </div>
+        <button onclick="closeModal('modalSettings')" class="text-church-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Organization / Church Name</label>
+          <input type="text" id="settingChurchName" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tax ID / EIN #</label>
+            <input type="text" id="settingTaxId" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Senior Pastor / Treasurer</label>
+            <input type="text" id="settingLeadName" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+        </div>
+
+        <button onclick="saveChurchSettings()" class="w-full py-2 bg-church-800 hover:bg-church-700 text-white font-semibold rounded-lg transition">
+          Update Organization Profile
+        </button>
+
+        <div class="pt-4 border-t border-slate-200 space-y-3">
+          <h4 class="font-bold text-slate-800">Data Backup & Migration</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="downloadJsonBackup()" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold flex items-center justify-center space-x-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Download Backup (JSON)</span>
+            </button>
+            <label class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold flex items-center justify-center space-x-1.5 cursor-pointer">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              <span>Restore Backup</span>
+              <input type="file" id="restoreFileInput" accept=".json" onchange="restoreJsonBackup(event)" class="hidden">
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="resetToSampleData()" class="py-2 px-3 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg font-semibold flex items-center justify-center space-x-1.5 border border-amber-200">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>Reload Sample Data</span>
+            </button>
+            <button onclick="clearAllData()" class="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-semibold flex items-center justify-center space-x-1.5 border border-rose-200">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Wipe All Records</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

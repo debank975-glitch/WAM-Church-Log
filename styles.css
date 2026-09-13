@@ -1,0 +1,57 @@
+/* Custom styles and print stylesheet for Church Financial Log */
+
+@layer utilities {
+  /* Hide scrollbars on overflow tabs */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Print Stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header, footer, nav, .no-print, button, .tab-button {
+    display: none !important;
+  }
+
+  /* Make the active modal printable */
+  .fixed {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+  }
+
+  #modalStatement, #modalReceipt {
+    display: block !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .shadow-2xl, .shadow-md, .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .border {
+    border-color: #cbd5e1 !important;
+  }
+}
+
+/* Transitions */
+.tab-content {
+  transition: opacity 0.15s ease-in-out;
+}
+
+/* Form input focus styles */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
