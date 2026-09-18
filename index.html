@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Church Financial Stewardship & General Ledger</title>
-  
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>World Ark Missions - Financial Stewardship & General Ledger</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -12,6 +18,10 @@
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+          },
           colors: {
             brand: {
               50: '#f0fdf4',
@@ -38,13 +48,13 @@
       }
     }
   </script>
-  
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@0.468.0"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex font-sans overflow-x-hidden">
 
@@ -54,8 +64,8 @@
       <div class="w-16 h-16 bg-brand-50 border border-brand-200 text-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-2xl font-black text-slate-900">Church Financial Portal</h2>
-      <p class="text-xs text-slate-500 mt-1">Authorized Personnel & Delegated Access Only</p>
+      <h2 class="text-2xl font-black text-slate-900">World Ark Missions</h2>
+      <p class="text-xs text-slate-500 mt-1">Financial Portal & Delegated Accounting</p>
 
       <div class="mt-6 space-y-4 text-left">
         <div>
@@ -66,7 +76,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Passcode / PIN</label>
-          <input type="password" id="loginPin" placeholder="Default PIN: 1234" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
+          <input type="password" id="loginPin" autocomplete="current-password" placeholder="Default PIN: 1234" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
           <p class="text-[11px] text-slate-400 mt-1">Admin demo PIN: <span class="font-mono font-bold text-slate-600">1234</span></p>
         </div>
         <button onclick="handleLogin()" class="w-full py-3 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2">
@@ -78,7 +88,7 @@
   </div>
 
   <!-- ================= SIDEBAR NAVIGATION (Requirement 18 & 19) ================= -->
-  <aside id="sidebar" class="w-64 bg-church-950 text-white flex-shrink-0 flex flex-col justify-between transition-all duration-300 z-30 min-h-screen sticky top-0 shadow-2xl">
+  <aside id="sidebar" class="app-sidebar w-64 bg-church-950 text-white flex-shrink-0 flex flex-col justify-between transition-all duration-300 z-40 min-h-screen sticky top-0 shadow-2xl">
     <div>
       <!-- Brand / Church Header -->
       <div class="p-5 border-b border-church-800/70 flex items-center justify-between">
@@ -87,20 +97,23 @@
             <i data-lucide="cross" class="w-5 h-5"></i>
           </div>
           <div class="overflow-hidden">
-            <h1 class="text-sm font-bold text-white truncate" id="sidebarChurchName">Grace Community</h1>
+            <h1 class="text-sm font-bold text-white truncate" id="sidebarChurchName">World Ark Missions</h1>
             <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Financial Ledger</p>
           </div>
         </div>
+        <button onclick="closeSidebar()" aria-label="Close navigation menu" title="Close navigation menu" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-church-800 transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
 
       <!-- User Badge -->
       <div class="px-5 py-3 bg-church-900/60 border-b border-church-800/40 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs" id="userInitial">
-            A
+            R
           </div>
           <div class="text-xs">
-            <div class="font-bold text-slate-200 leading-tight" id="sidebarUserName">Pastor David (Admin)</div>
+            <div class="font-bold text-slate-200 leading-tight" id="sidebarUserName">Reverend Benjamin Eturu Adom</div>
             <span class="text-[10px] text-accent-400 uppercase font-mono font-bold" id="sidebarUserRole">Administrator</span>
           </div>
         </div>
@@ -108,15 +121,15 @@
 
       <!-- Navigation Pages (Requirement 19: home page, budget page, tithe page, savings page, goals page, edit users, sign out) -->
       <nav class="p-3 space-y-1.5 text-xs font-semibold">
-        
+
         <button onclick="navigateTo('home')" id="nav-home" class="nav-item active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left">
           <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i>
           <span>Home Page</span>
         </button>
 
-        <button onclick="navigateTo('budget')" id="nav-budget" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
-          <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i>
-          <span>Budget Page</span>
+        <button onclick="navigateTo('quota')" id="nav-quota" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
+          <i data-lucide="gauge" class="w-4 h-4 text-indigo-400"></i>
+          <span>Quota</span>
         </button>
 
         <button onclick="navigateTo('tithe')" id="nav-tithe" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
@@ -133,6 +146,11 @@
         <button onclick="navigateTo('goals')" id="nav-goals" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
           <i data-lucide="target" class="w-4 h-4 text-amber-400"></i>
           <span>Goals Page</span>
+        </button>
+
+        <button onclick="navigateTo('charts')" id="nav-charts" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-fuchsia-400"></i>
+          <span>Charts</span>
         </button>
 
         <button onclick="navigateTo('editUsers')" id="nav-editUsers" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition text-left text-slate-300 hover:bg-church-900 hover:text-white">
@@ -163,52 +181,56 @@
       </button>
     </div>
   </aside>
+  <div id="sidebarBackdrop" class="sidebar-backdrop hidden" onclick="closeSidebar()" aria-hidden="true"></div>
 
   <!-- ================= MAIN CONTENT AREA ================= -->
   <div class="flex-1 flex flex-col min-w-0">
 
     <!-- Top Action Bar -->
-    <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20 shadow-sm no-print">
-      
+    <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-30 shadow-sm no-print">
+
       <!-- Time Range Switcher (Requirement 1: Monthly, Quarterly, Yearly) -->
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center gap-2 min-w-0 max-w-full">
+        <button onclick="toggleSidebar()" aria-label="Toggle navigation menu" title="Toggle navigation menu" class="sidebar-toggle inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex-shrink-0">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">Interval:</span>
-        <div class="inline-flex bg-slate-100 p-1 rounded-xl text-xs font-bold">
+        <div class="inline-flex bg-slate-100 p-1 rounded-xl text-[11px] sm:text-xs font-bold">
           <button onclick="setTimeInterval('monthly')" id="btn-interval-monthly" class="interval-btn active px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow-sm">Monthly</button>
           <button onclick="setTimeInterval('quarterly')" id="btn-interval-quarterly" class="interval-btn px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">Quarterly</button>
           <button onclick="setTimeInterval('yearly')" id="btn-interval-yearly" class="interval-btn px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">Yearly</button>
         </div>
-        <span id="activeIntervalLabel" class="text-xs font-mono font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200">
+        <span id="activeIntervalLabel" class="hidden xs:inline text-xs font-mono font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200 truncate max-w-[10rem]">
           September 2026
         </span>
       </div>
 
       <!-- Quick Action Buttons -->
-      <div class="flex items-center space-x-2.5">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 w-full sm:w-auto justify-end flex-wrap">
         <button onclick="openModal('modalPrintReport')" class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 transition">
           <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-600"></i>
-          <span>Print Report Sheet</span>
+          <span class="hidden sm:inline">Print Report Sheet</span>
         </button>
 
         <button onclick="openModal('modalIncome')" class="inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow transition">
           <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-          <span>Log Income</span>
+          <span class="hidden sm:inline">Log Income</span>
         </button>
 
         <button onclick="openModal('modalExpense')" class="inline-flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow transition">
           <i data-lucide="minus-circle" class="w-3.5 h-3.5"></i>
-          <span>Log Expense</span>
+          <span class="hidden sm:inline">Log Expenditure</span>
         </button>
       </div>
 
     </header>
 
     <!-- Content Pages Container -->
-    <main class="flex-1 p-6 space-y-6 max-w-7xl w-full mx-auto">
+    <main class="flex-1 p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl w-full mx-auto min-w-0">
 
       <!-- ==================== PAGE 1: HOME PAGE ==================== -->
       <div id="page-home" class="page-view space-y-6">
-        
+
         <!-- Quota Reminder Banner (Requirement 2) -->
         <div id="quotaBanner" class="p-4 rounded-2xl border flex items-center justify-between shadow-sm">
           <div class="flex items-center space-x-3">
@@ -226,74 +248,74 @@
           </div>
         </div>
 
-        <!-- 3 Master KPI Cards (Requirement 3: Income, Expenses, Balance) + Bank vs Cash (Req 15) -->
+        <!-- 3 Master KPI Cards (Requirement 3: Income, Expenditure, Balance) + Mobile Money vs Cash (Req 7 & 15) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
+
           <!-- Income Card -->
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Income</span>
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="cardIncomeLabel">Current Monthly Income</span>
               <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <i data-lucide="trending-up" class="w-4 h-4"></i>
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="text-2xl font-black text-slate-900" id="cardTotalIncome">$0.00</h3>
-              <p class="text-[11px] text-slate-500 mt-0.5" id="cardIncomeSubtext">Selected interval</p>
+              <h3 class="text-2xl font-black text-slate-900 font-mono" id="cardTotalIncome">GH₵ 0.00</h3>
+              <p class="text-[11px] text-slate-500 mt-0.5" id="cardIncomeSubtext">Current Monthly Income</p>
             </div>
           </div>
 
-          <!-- Expenses Card -->
+          <!-- Expenditure Card -->
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Expenses</span>
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="cardExpenseLabel">Current Monthly Expenditure</span>
               <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                 <i data-lucide="trending-down" class="w-4 h-4"></i>
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="text-2xl font-black text-slate-900" id="cardTotalExpenses">$0.00</h3>
-              <p class="text-[11px] text-slate-500 mt-0.5" id="cardExpenseSubtext">Disbursed funds</p>
+              <h3 class="text-2xl font-black text-slate-900 font-mono" id="cardTotalExpenses">GH₵ 0.00</h3>
+              <p class="text-[11px] text-slate-500 mt-0.5" id="cardExpenseSubtext">Current Monthly Expenditure</p>
             </div>
           </div>
 
           <!-- Net Balance Card (Requirement 3) -->
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Balance / Reserve</span>
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="cardBalanceLabel">Current Operating Reserve</span>
               <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <i data-lucide="wallet" class="w-4 h-4"></i>
               </div>
             </div>
             <div class="mt-3">
-              <h3 class="text-2xl font-black text-slate-900" id="cardNetBalance">$0.00</h3>
+              <h3 class="text-2xl font-black text-slate-900 font-mono" id="cardNetBalance">GH₵ 0.00</h3>
               <p class="text-[11px] text-slate-500 mt-0.5" id="cardBalanceSubtext">Operating surplus</p>
             </div>
           </div>
 
-          <!-- Bank vs Cash on Hand (Requirement 15) -->
+          <!-- Mobile Money Wallet vs Cash on Hand (Requirement 7 & 15) -->
           <div class="bg-gradient-to-br from-church-900 to-church-800 text-white p-5 rounded-2xl shadow-sm border border-church-700 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-accent-400 uppercase tracking-wider">Custody Breakdown</span>
-              <i data-lucide="landmark" class="w-4 h-4 text-accent-400"></i>
+              <i data-lucide="smartphone" class="w-4 h-4 text-accent-400"></i>
             </div>
             <div class="mt-2 space-y-1.5 text-xs font-mono">
               <div class="flex justify-between items-center">
-                <span class="text-slate-300 font-sans">In Bank Account:</span>
-                <span class="font-bold text-emerald-400" id="cardBankTotal">$0.00</span>
+                <span class="text-slate-300 font-sans">Mobile Money Wallet:</span>
+                <span class="font-bold text-emerald-400" id="cardBankTotal">GH₵ 0.00</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-slate-300 font-sans">Cash on Hand:</span>
-                <span class="font-bold text-accent-400" id="cardCashOnHand">$0.00</span>
+                <span class="font-bold text-accent-400" id="cardCashOnHand">GH₵ 0.00</span>
               </div>
             </div>
           </div>
 
         </div>
 
-        <!-- Visual Representation with Pie Charts (Requirement 6) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+        <!-- Visual Representation with Pie Charts (Requirement 6 & 8: Prices under pie charts) -->
+        <div id="chartsPanel" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
           <!-- Income Distribution Pie Chart -->
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
@@ -302,30 +324,44 @@
                   <h3 class="font-bold text-slate-900 text-sm">Income Distribution</h3>
                   <p class="text-xs text-slate-500">Breakdown of tithes, offerings, & special funds</p>
                 </div>
-                <span class="text-xs font-mono bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">Pie Chart</span>
+                <span class="text-xs font-mono bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-200" id="chartIncomeTotalBadge">GH₵ 0.00</span>
               </div>
               <div class="h-60 relative flex items-center justify-center">
                 <canvas id="chartIncomePie"></canvas>
+                <div id="chartIncomeCenterValue" class="absolute inset-0 flex items-center justify-center pointer-events-none text-sm font-black font-mono text-emerald-700">GH₵ 0.00</div>
               </div>
             </div>
-            <div id="legendIncomePie" class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600"></div>
+            <div class="mt-4 pt-4 border-t border-slate-100">
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
+                <span>Category</span>
+                <span>Distribution Amount</span>
+              </div>
+              <div id="legendIncomePie" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+            </div>
           </div>
 
-          <!-- Expenses Distribution Pie Chart -->
+          <!-- Expenditure Distribution Pie Chart -->
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-4">
                 <div>
-                  <h3 class="font-bold text-slate-900 text-sm">Expenses Distribution</h3>
+                  <h3 class="font-bold text-slate-900 text-sm">Expenditure Distribution</h3>
                   <p class="text-xs text-slate-500">Breakdown by ministry departments & categories</p>
                 </div>
-                <span class="text-xs font-mono bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">Pie Chart</span>
+                <span class="text-xs font-mono bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-lg border border-rose-200" id="chartExpenseTotalBadge">GH₵ 0.00</span>
               </div>
               <div class="h-60 relative flex items-center justify-center">
                 <canvas id="chartExpensePie"></canvas>
+                <div id="chartExpenseCenterValue" class="absolute inset-0 flex items-center justify-center pointer-events-none text-sm font-black font-mono text-rose-700">GH₵ 0.00</div>
               </div>
             </div>
-            <div id="legendExpensePie" class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600"></div>
+            <div class="mt-4 pt-4 border-t border-slate-100">
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
+                <span>Category</span>
+                <span>Distribution Amount</span>
+              </div>
+              <div id="legendExpensePie" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+            </div>
           </div>
 
         </div>
@@ -342,7 +378,7 @@
               <select id="ledgerFilterType" onchange="renderLedgerTable()" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs bg-white">
                 <option value="ALL">All Entries</option>
                 <option value="INCOME">Income Only</option>
-                <option value="EXPENSE">Expense Only</option>
+                <option value="EXPENSE">Expenditure Only</option>
               </select>
             </div>
           </div>
@@ -370,13 +406,21 @@
 
       </div>
 
-      <!-- ==================== PAGE 2: BUDGET PAGE (Req 2, 10, 12) ==================== -->
-      <div id="page-budget" class="page-view hidden space-y-6">
-        
+      <!-- ==================== PAGE 7: CHARTS ==================== -->
+      <div id="page-charts" class="page-view hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900">Charts</h2>
+          <p class="text-xs text-slate-500 mt-1">Income and expenditure distribution for the selected interval</p>
+        </div>
+      </div>
+
+      <!-- ==================== PAGE 2: QUOTA PAGE (Req 2, 10, 12) ==================== -->
+      <div id="page-quota" class="page-view hidden space-y-6">
+
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 class="text-lg font-bold text-slate-900">Budget Quotas & Departmental Allocations</h2>
-            <p class="text-xs text-slate-500">Monthly, Quarterly, and Yearly spending thresholds and category variants</p>
+            <h2 class="text-lg font-bold text-slate-900">Quota Settings & Departmental Allocations</h2>
+            <p class="text-xs text-slate-500">Edit monthly, quarterly, and yearly usage limits for each expenditure category</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="openModal('modalManageCategories')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
@@ -399,7 +443,7 @@
 
       <!-- ==================== PAGE 3: TITHE PAGE (Req 13, 16, 17) ==================== -->
       <div id="page-tithe" class="page-view hidden space-y-6">
-        
+
         <!-- Header & Instructions -->
         <div class="bg-gradient-to-r from-church-950 via-church-900 to-church-800 text-white p-6 rounded-3xl shadow-lg border border-church-800">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -430,18 +474,18 @@
           </div>
 
           <!-- Month Tithe Summary Banner -->
-          <div class="mt-6 pt-5 border-t border-church-800/80 grid grid-cols-3 gap-3 text-center text-xs font-mono">
+          <div class="mt-6 pt-5 border-t border-church-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-xs font-mono">
             <div class="bg-church-900/60 p-3 rounded-2xl border border-church-800">
               <span class="text-[10px] text-slate-400 uppercase block font-sans font-bold">Physical Cash Tithes</span>
-              <span class="text-emerald-400 font-bold text-base" id="titheMonthPhysical">$0.00</span>
+              <span class="text-emerald-400 font-bold text-base" id="titheMonthPhysical">GH₵ 0.00</span>
             </div>
             <div class="bg-church-900/60 p-3 rounded-2xl border border-church-800">
               <span class="text-[10px] text-slate-400 uppercase block font-sans font-bold">E-Cash Tithes</span>
-              <span class="text-accent-400 font-bold text-base" id="titheMonthECash">$0.00</span>
+              <span class="text-accent-400 font-bold text-base" id="titheMonthECash">GH₵ 0.00</span>
             </div>
             <div class="bg-church-900/60 p-3 rounded-2xl border border-church-800">
               <span class="text-[10px] text-slate-400 uppercase block font-sans font-bold">Month Tithe Total</span>
-              <span class="text-white font-black text-base" id="titheMonthTotal">$0.00</span>
+              <span class="text-white font-black text-base" id="titheMonthTotal">GH₵ 0.00</span>
             </div>
           </div>
         </div>
@@ -460,48 +504,84 @@
 
       </div>
 
-      <!-- ==================== PAGE 4: SAVINGS PAGE (Req 11) ==================== -->
+      <!-- ==================== PAGE 4: SAVINGS PAGE (Req 11, 2, 13) ==================== -->
       <div id="page-savings" class="page-view hidden space-y-6">
-        
+
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 class="text-lg font-bold text-slate-900">Church Savings & Reserve Funds</h2>
-            <p class="text-xs text-slate-500">Track designated savings, building reserves, emergency funds, and growth</p>
+            <h2 class="text-lg font-bold text-slate-900">Total Church Savings & Reserves</h2>
+            <p class="text-xs text-slate-500">Track total consolidated church savings, make deposits, withdraw into operating income, and manage records</p>
           </div>
-          <button onclick="openModal('modalAddSavingsDeposit')" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            <span>Deposit into Savings</span>
-          </button>
+          <div class="flex items-center space-x-2">
+            <button onclick="openModal('modalAddSavingsDeposit')" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+              <span>Deposit into Savings</span>
+            </button>
+            <button onclick="openModal('modalWithdrawSavings')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+              <i data-lucide="arrow-down-circle" class="w-3.5 h-3.5"></i>
+              <span>Withdraw from Savings</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Savings Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          
-          <div class="bg-teal-50 border border-teal-200 p-5 rounded-2xl">
-            <span class="text-xs font-bold text-teal-800 uppercase tracking-wider block">Total Church Savings</span>
-            <h3 class="text-2xl font-black text-teal-900 mt-2 font-mono" id="savingsGrandTotal">$0.00</h3>
-            <p class="text-[11px] text-teal-700 mt-1">Across all designated savings accounts</p>
-          </div>
+        <!-- Master Total Church Savings Card (No categories, single consolidated amount saved) -->
+        <div class="bg-gradient-to-br from-teal-900 via-teal-800 to-church-950 text-white p-8 rounded-3xl shadow-lg border border-teal-700/50">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <div class="inline-flex items-center space-x-2 bg-teal-500/20 text-teal-300 px-3 py-1 rounded-full text-xs font-bold border border-teal-400/30 mb-3">
+                <i data-lucide="piggy-bank" class="w-3.5 h-3.5"></i>
+                <span>Consolidated Church Reserve</span>
+              </div>
+              <span class="text-xs font-bold text-teal-200 uppercase tracking-widest block font-sans">Total Church Savings</span>
+              <h3 class="text-4xl sm:text-5xl font-black text-white mt-2 font-mono tracking-tight" id="savingsGrandTotal">GH₵ 0.00</h3>
+              <p class="text-xs text-teal-200/80 mt-2 max-w-xl">
+                Total accumulated reserves for World Ark Missions. Withdrawals automatically transfer funds directly into church operating income.
+              </p>
+            </div>
 
-          <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl">
-            <span class="text-xs font-bold text-blue-800 uppercase tracking-wider block">Building Expansion Reserve</span>
-            <h3 class="text-2xl font-black text-blue-900 mt-2 font-mono" id="savingsBuildingTotal">$0.00</h3>
-            <p class="text-[11px] text-blue-700 mt-1">Dedicated capital sanctuary fund</p>
+            <div class="flex flex-wrap gap-2.5">
+              <button onclick="openEditSavingsBalanceModal()" class="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs rounded-xl transition flex items-center space-x-1.5">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-teal-300"></i>
+                <span>Edit Balance</span>
+              </button>
+              <button onclick="openModal('modalAddSavingsDeposit')" class="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-church-950 font-black text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Deposit Funds</span>
+              </button>
+              <button onclick="openModal('modalWithdrawSavings')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-church-950 font-black text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+                <i data-lucide="arrow-down-circle" class="w-4 h-4"></i>
+                <span>Withdraw to Income</span>
+              </button>
+            </div>
           </div>
-
-          <div class="bg-purple-50 border border-purple-200 p-5 rounded-2xl">
-            <span class="text-xs font-bold text-purple-800 uppercase tracking-wider block">Emergency & Welfare Reserve</span>
-            <h3 class="text-2xl font-black text-purple-900 mt-2 font-mono" id="savingsEmergencyTotal">$0.00</h3>
-            <p class="text-[11px] text-purple-700 mt-1">Benevolence and contingency savings</p>
-          </div>
-
         </div>
 
-        <!-- Savings Accounts & Growth Progress -->
+        <!-- Savings Activity & Records List (Edit & Remove support) -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm">Designated Savings Accounts</h3>
-          <div id="savingsAccountsList" class="space-y-4">
-            <!-- Injected dynamically -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Savings Records & Activity History</h3>
+              <p class="text-xs text-slate-500">Audit trail of all church savings deposits and withdrawals (records can be edited or removed)</p>
+            </div>
+            <span class="text-xs font-mono text-slate-400" id="savingsRecordCount">0 records</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">Date</th>
+                  <th class="py-3 px-4">Transaction Type</th>
+                  <th class="py-3 px-4">Description</th>
+                  <th class="py-3 px-4">Custody / Channel</th>
+                  <th class="py-3 px-4 text-right">Amount</th>
+                  <th class="py-3 px-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="savingsHistoryTableBody" class="divide-y divide-slate-100 font-medium">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -509,13 +589,13 @@
 
       <!-- ==================== PAGE 5: GOALS PAGE (Req 10, 19) ==================== -->
       <div id="page-goals" class="page-view hidden space-y-6">
-        
+
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 class="text-lg font-bold text-slate-900">Financial Goals & Milestones</h2>
             <p class="text-xs text-slate-500">Monthly, Quarterly, and Yearly stewardship fundraising and capital goals</p>
           </div>
-          <button onclick="openModal('modalAddGoal')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+          <button onclick="openAddGoalModal()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
             <span>Add Stewardship Goal</span>
           </button>
@@ -530,7 +610,7 @@
 
       <!-- ==================== PAGE 6: EDIT USERS (Req 4, 19) ==================== -->
       <div id="page-editUsers" class="page-view hidden space-y-6">
-        
+
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 class="text-lg font-bold text-slate-900">Delegated User Accounts & Roles</h2>
@@ -578,7 +658,7 @@
       </div>
       <h3 class="text-base font-bold text-slate-900" id="confirmTitle">Confirm Action</h3>
       <p class="text-xs text-slate-500 mt-1" id="confirmMessage">Are you sure you want to proceed?</p>
-      
+
       <div class="mt-5 flex space-x-2">
         <button type="button" onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
           Cancel
@@ -612,7 +692,7 @@
           <div>
             <label class="block font-bold text-slate-700 mb-1">Custody / Destination *</label>
             <select id="incCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <option value="Bank">Sent to Bank Account</option>
+              <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
               <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
             </select>
           </div>
@@ -639,7 +719,7 @@
             <input type="text" id="incDonor" placeholder="e.g. Sunday Collection Basket" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount ($) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
             <input type="number" step="0.01" min="0.01" id="incAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 font-mono">
           </div>
         </div>
@@ -664,7 +744,7 @@
       <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <i data-lucide="minus-circle" class="w-5 h-5 text-rose-400"></i>
-          <h3 class="font-bold text-sm">Record Expenditure Disbursement</h3>
+          <h3 class="font-bold text-sm">Record Expenditure</h3>
         </div>
         <button onclick="closeModal('modalExpense')" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -678,9 +758,9 @@
             <input type="date" id="expDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Disbursed From (Custody) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Paid From (Custody) *</label>
             <select id="expCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <option value="Bank">Bank Account (Check / Wire)</option>
+              <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
               <option value="Cash on Hand">Cash on Hand (Petty Cash)</option>
             </select>
           </div>
@@ -707,7 +787,7 @@
             <input type="text" id="expPayee" placeholder="e.g. City Water Dept" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount ($) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
             <input type="number" step="0.01" min="0.01" id="expAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 font-mono">
           </div>
         </div>
@@ -715,28 +795,28 @@
         <!-- Description Option for Details (Requirement 16) -->
         <div>
           <label class="block font-bold text-slate-700 mb-1">Description / Details *</label>
-          <textarea id="expDesc" rows="2" placeholder="Provide detailed explanation regarding this expense entry..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"></textarea>
+          <textarea id="expDesc" rows="2" placeholder="Provide detailed explanation regarding this expenditure entry..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"></textarea>
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
           <button type="button" onclick="closeModal('modalExpense')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow">Disburse & Save</button>
+          <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow">Save Expenditure</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: TITHE DAY ENTRY (Requirement 13, 16, 17) -->
-  <!-- Note: Description option does NOT apply to tithe page as requested in Requirement 16 -->
-  <div id="modalTitheDay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+  <!-- MODAL: TITHE DAY ENTRY (Requirement 12, 13, 16, 17) -->
+  <!-- Note: Tithe payers show as a list when day is tapped, and new tithe records can be added -->
+  <div id="modalTitheDay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 my-6">
       <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
         <div>
           <h3 class="font-bold text-sm flex items-center space-x-1.5">
             <i data-lucide="calendar" class="w-4 h-4 text-accent-400"></i>
-            <span id="titheModalDayTitle">Tithe Entries for Date</span>
+            <span id="titheModalDayTitle">Tithe Payers & Entries</span>
           </h3>
-          <p class="text-[11px] text-slate-400">Add member tithe and check E-Cash vs Physical Money</p>
+          <p class="text-[11px] text-slate-400">View tithe payers for this day and record new contributions</p>
         </div>
         <button onclick="closeModal('modalTitheDay')" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -744,26 +824,39 @@
       </div>
 
       <div class="p-6 space-y-4 text-xs">
-        
-        <!-- Existing Tithes for this day -->
+
+        <!-- List of Tithe Payers for this day (Requirement 12) -->
         <div class="space-y-2">
-          <span class="font-bold text-slate-700 block">Existing Tithes for this Day:</span>
-          <div id="titheDayExistingList" class="max-h-36 overflow-y-auto space-y-1.5 border border-slate-200 rounded-xl p-2 bg-slate-50">
-            <!-- Populated dynamically -->
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 text-xs flex items-center space-x-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-accent-500"></i>
+              <span>Tithe Payers on This Day:</span>
+            </span>
+            <span id="titheDayTotalBadge" class="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">GH₵ 0.00</span>
+          </div>
+
+          <div id="titheDayExistingList" class="max-h-48 overflow-y-auto space-y-1.5 border border-slate-200 rounded-2xl p-2.5 bg-slate-50">
+            <!-- Populated dynamically with tithe payer names, amounts, payment method, and remove action -->
+          </div>
+          <div id="tithePendingList" class="hidden border border-amber-200 rounded-2xl p-2.5 bg-amber-50 space-y-1.5">
+            <!-- New entries waiting to be saved together -->
           </div>
         </div>
 
-        <!-- Add Tithe Form for this Day -->
-        <div class="border-t border-slate-100 pt-3 space-y-3">
-          <span class="font-bold text-slate-900 block">Add New Tithe Entry</span>
-          
+        <!-- Add Tithe Form for this Day (Requirement 12: keep old feature where records can be added) -->
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <span class="font-bold text-slate-900 block text-xs flex items-center space-x-1.5">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>Add New Tithe Payer & Contribution</span>
+          </span>
+
           <div>
             <label class="block font-bold text-slate-700 mb-1">Donor / Member Name *</label>
-            <input type="text" id="titheDonorName" placeholder="e.g. Deacon Robert" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            <input type="text" id="titheDonorName" placeholder="e.g. Deacon Robert Vance" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Tithe Amount ($) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Tithe Amount (GH₵) *</label>
             <input type="number" step="0.01" min="0.01" id="titheAmount" placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold font-mono">
           </div>
 
@@ -776,7 +869,7 @@
               </label>
               <label class="flex items-center space-x-2 cursor-pointer">
                 <input type="checkbox" id="titheIsECash" class="w-4 h-4 text-accent-500 rounded">
-                <span class="font-bold text-slate-700">E-Cash (Online/Card/MoMo)</span>
+                <span class="font-bold text-slate-700">E-Cash (Mobile Money Wallet)</span>
               </label>
             </div>
             <p class="text-[10px] text-slate-400">
@@ -786,7 +879,8 @@
 
           <div class="pt-2 flex justify-end space-x-2">
             <button type="button" onclick="closeModal('modalTitheDay')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl">Close</button>
-            <button type="button" onclick="saveDayTitheEntry()" class="px-5 py-2 bg-accent-500 hover:bg-accent-600 text-church-950 font-black rounded-xl shadow">Save Day Tithe</button>
+            <button type="button" onclick="queueDayTitheEntry()" class="px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl shadow transition">Add Entry</button>
+            <button type="button" onclick="saveDayTitheEntries()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow transition">Save All Tithes</button>
           </div>
         </div>
 
@@ -835,7 +929,7 @@
             <div>
               <label class="block text-slate-500 font-semibold mb-1">Category Type</label>
               <select id="catManagerNewType" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl">
-                <option value="EXPENSE">Expense Category</option>
+                <option value="EXPENSE">Expenditure Category</option>
                 <option value="INCOME">Income Category</option>
               </select>
             </div>
@@ -878,15 +972,15 @@
 
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Monthly Goal ($)</label>
+            <label class="block font-bold text-slate-700 mb-1">Monthly Goal (GH₵)</label>
             <input type="number" id="budgetMonthlyGoal" step="10" placeholder="0" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Quarterly Goal ($)</label>
+            <label class="block font-bold text-slate-700 mb-1">Quarterly Goal (GH₵)</label>
             <input type="number" id="budgetQuarterlyGoal" step="50" placeholder="0" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Yearly Goal ($)</label>
+            <label class="block font-bold text-slate-700 mb-1">Yearly Goal (GH₵)</label>
             <input type="number" id="budgetYearlyGoal" step="100" placeholder="0" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold">
           </div>
         </div>
@@ -899,55 +993,186 @@
     </div>
   </div>
 
-  <!-- MODAL: ADD SAVINGS DEPOSIT (Req 11) -->
+  <!-- MODAL: ADD SAVINGS DEPOSIT (Req 11, 13) -->
   <div id="modalAddSavingsDeposit" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
       <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
-        <h3 class="font-bold text-sm">Deposit into Church Savings</h3>
+        <h3 class="font-bold text-sm flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-teal-400"></i>
+          <span>Deposit into Church Savings</span>
+        </h3>
         <button onclick="closeModal('modalAddSavingsDeposit')" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="formSavings" onsubmit="handleSavingsDepositSubmit(event)" class="p-6 space-y-4 text-xs">
+      <form id="formSavingsDeposit" onsubmit="handleSavingsDepositSubmit(event)" class="p-6 space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Savings Account *</label>
-          <select id="savingsTargetAccount" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-            <option value="Building & Capital Reserve">Building & Capital Reserve</option>
-            <option value="Emergency Welfare Fund">Emergency Welfare Fund</option>
-            <option value="Youth & Education Endowment">Youth & Education Endowment</option>
+          <label class="block font-bold text-slate-700 mb-1">Deposit Amount (GH₵) *</label>
+          <input type="number" step="0.01" min="0.01" id="savingsDepositAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Source Custody Channel *</label>
+          <select id="savingsDepositCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
+            <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
           </select>
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Deposit Amount ($) *</label>
-          <input type="number" step="0.01" min="0.01" id="savingsDepositAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold">
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Description</label>
-          <input type="text" id="savingsDepositDesc" placeholder="e.g. Monthly surplus transfer" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+          <label class="block font-bold text-slate-700 mb-1">Description / Purpose</label>
+          <input type="text" id="savingsDepositDesc" placeholder="e.g. Monthly surplus reserve transfer" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="pt-2 flex justify-end space-x-2">
           <button type="button" onclick="closeModal('modalAddSavingsDeposit')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-teal-600 text-white font-bold rounded-xl shadow">Confirm Deposit</button>
+          <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow">Confirm Deposit</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: ADD GOAL (Req 10, 19) -->
+  <!-- MODAL: WITHDRAW FROM SAVINGS (Req 13: Added to income on withdrawal) -->
+  <div id="modalWithdrawSavings" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm flex items-center space-x-2">
+            <i data-lucide="arrow-down-circle" class="w-4 h-4 text-amber-400"></i>
+            <span>Withdraw from Church Savings</span>
+          </h3>
+          <p class="text-[11px] text-slate-400">Withdrawals are automatically credited to Operating Income</p>
+        </div>
+        <button onclick="closeModal('modalWithdrawSavings')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formSavingsWithdrawal" onsubmit="handleSavingsWithdrawSubmit(event)" class="p-6 space-y-4 text-xs">
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 space-y-1">
+          <div class="flex justify-between font-bold">
+            <span>Available Church Savings:</span>
+            <span id="savingsWithdrawAvailable" class="font-mono">GH₵ 0.00</span>
+          </div>
+          <p class="text-[11px] text-amber-700">Withdrawn amount will immediately reflect as Income in the General Ledger.</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Withdrawal Amount (GH₵) *</label>
+          <input type="number" step="0.01" min="0.01" id="savingsWithdrawAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Added To Custody Channel *</label>
+          <select id="savingsWithdrawCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
+            <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Reason / Purpose for Withdrawal *</label>
+          <input type="text" id="savingsWithdrawDesc" placeholder="e.g. Transfer reserve funds to operating income" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalWithdrawSavings')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow">Withdraw & Credit Income</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT SAVINGS RECORD (Req 2) -->
+  <div id="modalEditSavingsRecord" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-sm">Edit Savings Record</h3>
+        <button onclick="closeModal('modalEditSavingsRecord')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formEditSavingsRecord" onsubmit="handleEditSavingsRecordSubmit(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="editSavingsRecId" value="">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Date *</label>
+            <input type="date" id="editSavingsRecDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Transaction Type *</label>
+            <select id="editSavingsRecType" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+              <option value="DEPOSIT">Deposit (+)</option>
+              <option value="WITHDRAWAL">Withdrawal (-)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
+            <input type="number" step="0.01" min="0.01" id="editSavingsRecAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Custody Channel *</label>
+            <select id="editSavingsRecCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+              <option value="Mobile Money Wallet">Mobile Money Wallet</option>
+              <option value="Cash on Hand">Cash on Hand</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Description</label>
+          <input type="text" id="editSavingsRecDesc" placeholder="Description of savings record" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalEditSavingsRecord')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow">Update Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DIRECT ADJUST SAVINGS BALANCE (Req 2) -->
+  <div id="modalEditSavingsBalance" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-sm">Adjust Total Savings Balance</h3>
+        <button onclick="closeModal('modalEditSavingsBalance')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formEditSavingsBalance" onsubmit="handleDirectSavingsBalanceSubmit(event)" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">New Total Church Savings Amount (GH₵) *</label>
+          <input type="number" step="0.01" min="0" id="directSavingsBalanceInput" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-base">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Audit Note / Reason *</label>
+          <input type="text" id="directSavingsBalanceNote" placeholder="e.g. Reconciled with savings account statement" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modalEditSavingsBalance')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow">Save Balance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT GOAL (Req 10, 14, 19: Syncs with Income & Expenses) -->
   <div id="modalAddGoal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
       <div class="bg-church-950 text-white px-6 py-4 flex items-center justify-between">
-        <h3 class="font-bold text-sm">Create Stewardship Goal</h3>
+        <div>
+          <h3 class="font-bold text-sm" id="modalGoalHeading">Create Stewardship Goal</h3>
+          <p class="text-[11px] text-slate-400">Funds raised and used reflect automatically in Income & Expenditure</p>
+        </div>
         <button onclick="closeModal('modalAddGoal')" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <form id="formGoal" onsubmit="handleGoalSubmit(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="goalEditId" value="">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Goal Title *</label>
-          <input type="text" id="goalTitle" placeholder="e.g. New Sound Console Fund" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+          <input type="text" id="goalTitle" placeholder="e.g. New Sanctuary Sound Console" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -959,17 +1184,35 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Target Amount ($) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Target Goal Amount (GH₵) *</label>
             <input type="number" step="10" min="1" id="goalTargetAmount" placeholder="5000" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold">
           </div>
         </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Initial Amount Raised ($)</label>
-          <input type="number" step="10" min="0" id="goalCurrentAmount" value="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Amount Raised (Income) (GH₵)</label>
+            <input type="number" step="1" min="0" id="goalCurrentAmount" value="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-emerald-700 font-bold">
+            <span class="text-[10px] text-slate-400">Reflects in Total Income</span>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Amount Used (Expenditure) (GH₵)</label>
+            <input type="number" step="1" min="0" id="goalSpentAmount" value="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-rose-600 font-bold">
+            <span class="text-[10px] text-slate-400">Reflects in Expenditure</span>
+          </div>
         </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Custody Channel *</label>
+          <select id="goalCustody" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
+            <option value="Cash on Hand">Cash on Hand</option>
+          </select>
+        </div>
+
         <div class="pt-2 flex justify-end space-x-2">
           <button type="button" onclick="closeModal('modalAddGoal')" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-amber-600 text-white font-bold rounded-xl shadow">Save Goal</button>
+          <button type="submit" id="btnGoalSubmit" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow transition">Save Goal</button>
         </div>
       </form>
     </div>
@@ -1014,7 +1257,7 @@
             </label>
             <label class="flex items-center space-x-2">
               <input type="checkbox" id="permLogExpense" checked class="rounded text-brand-600">
-              <span class="text-slate-700">Disburse Expenditures</span>
+              <span class="text-slate-700">Log Expenditure</span>
             </label>
             <label class="flex items-center space-x-2">
               <input type="checkbox" id="permPrintReports" checked class="rounded text-brand-600">
@@ -1043,8 +1286,9 @@
             <i data-lucide="printer" class="w-3.5 h-3.5"></i>
             <span>Print Sheet</span>
           </button>
-          <button onclick="closeModal('modalPrintReport')" class="text-slate-400 hover:text-white">
+          <button onclick="closeModal('modalPrintReport')" aria-label="Close print report" title="Close print report" class="px-2 py-1 text-slate-400 hover:text-white rounded-lg hover:bg-church-800 flex items-center space-x-1">
             <i data-lucide="x" class="w-5 h-5"></i>
+            <span class="text-xs font-bold">Close</span>
           </button>
         </div>
       </div>
@@ -1056,6 +1300,11 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <noscript>
+    <div class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950 p-6 text-center text-white">
+      JavaScript is required to use the church financial portal.
+    </div>
+  </noscript>
+  <script src="src/js/app.js"></script>
 </body>
 </html>

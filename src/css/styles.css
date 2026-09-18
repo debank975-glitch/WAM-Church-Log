@@ -1,0 +1,331 @@
+/* Church Financial Log & Stewardship Stylesheet - World Ark Missions */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: -0.011em;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Sidebar navigation active style */
+.nav-item.active {
+  background-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+/* Time interval buttons */
+.interval-btn.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Rounded Tithe Date Box styling (Requirement 17) */
+.tithe-day-card {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border-radius: 1.25rem; /* rounded-2xl */
+}
+
+.tithe-day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  border-color: #f59e0b;
+}
+
+.tithe-day-card.has-tithes {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #86efac;
+}
+
+.tithe-day-card.today {
+  border: 2px solid #3b82f6;
+}
+
+.sidebar-toggle {
+  display: inline-flex;
+}
+
+.app-sidebar > div:first-child,
+.app-sidebar > div:last-child {
+  flex-shrink: 0;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(2px);
+  z-index: 35;
+}
+
+.app-sidebar {
+  width: 16rem;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+.app-sidebar.sidebar-collapsed {
+  width: 0;
+  overflow: hidden;
+  border: 0;
+}
+
+.app-sidebar.sidebar-collapsed > * {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.sidebar-collapsed-page .app-sidebar {
+  width: 0;
+}
+
+@media (max-width: 767px) {
+  body.sidebar-locked {
+    overflow: hidden;
+  }
+
+  .app-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0;
+    width: min(86vw, 20rem);
+    flex: none !important;
+    min-height: 100dvh;
+    transform: translateX(-105%);
+    overflow-y: auto;
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.22);
+  }
+
+  .app-sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .app-sidebar.sidebar-collapsed,
+  body.sidebar-collapsed-page .app-sidebar {
+    width: min(86vw, 20rem);
+    transform: translateX(-105%);
+  }
+
+  .app-sidebar.sidebar-collapsed > * {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  header {
+    min-height: 4.5rem;
+    align-items: stretch;
+  }
+
+  header > div:first-child {
+    width: 100%;
+  }
+
+  header > div:first-child > div {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  header > div:first-child > div::-webkit-scrollbar {
+    display: none;
+  }
+
+  header .interval-btn {
+    flex-shrink: 0;
+    min-height: 2.25rem;
+  }
+
+  header > div:last-child {
+    min-width: 0;
+    width: 100%;
+    flex: 0 0 100%;
+    justify-content: stretch;
+  }
+
+  header > div:last-child > button {
+    flex: 1 1 0;
+    width: 0;
+    justify-content: center;
+    min-height: 2.5rem;
+    min-width: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .app-sidebar nav {
+    overflow-y: auto;
+    max-height: calc(100dvh - 12rem);
+  }
+
+  .app-sidebar .tithe-day-card {
+    min-width: 0;
+  }
+
+  .page-view {
+    min-width: 0;
+  }
+
+  body > .flex-1 {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .page-view .grid {
+    min-width: 0;
+  }
+
+  .page-view > .bg-white,
+  .page-view > .bg-gradient-to-r,
+  .page-view > .bg-gradient-to-br {
+    max-width: 100%;
+  }
+
+  table {
+    min-width: 42rem;
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  button,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    touch-action: manipulation;
+  }
+
+  .tithe-day-card {
+    min-height: 7rem;
+  }
+
+  .fixed.inset-0 {
+    align-items: flex-start;
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem
+      max(0.75rem, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .fixed.inset-0 > div {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 1.5rem);
+    margin-top: 0;
+    margin-bottom: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .fixed.inset-0 > div > form,
+  .fixed.inset-0 > div > div:not(.bg-church-950) {
+    min-width: 0;
+  }
+
+  .fixed.inset-0 .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .fixed.inset-0 form,
+  .fixed.inset-0 > div > div.p-6 {
+    padding: 1rem;
+  }
+
+  .fixed.inset-0 .pt-2.flex,
+  .fixed.inset-0 .pt-3.flex {
+    flex-wrap: wrap;
+  }
+
+  .fixed.inset-0 .pt-2.flex > button,
+  .fixed.inset-0 .pt-3.flex > button {
+    flex: 1 1 8rem;
+    min-height: 2.75rem;
+  }
+
+  #modalTitheDay .pt-2.flex > button {
+    flex-basis: 100%;
+  }
+
+  #modalTitheDay .pt-2.flex > button + button {
+    flex-basis: calc(50% - 0.25rem);
+  }
+
+  #modalPrintReport #printableReportSheet {
+    padding: 1rem;
+  }
+
+  #modalPrintReport #printableReportSheet > .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #modalPrintReport .bg-church-950 {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  #modalPrintReport .bg-church-950 > div:last-child {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Print Sheet Styling (Requirement 5) */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  aside, header, #authOverlay, .no-print, button, select {
+    display: none !important;
+  }
+
+  .page-view {
+    display: block !important;
+  }
+
+  #modalPrintReport {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #printableReportSheet {
+    padding: 0 !important;
+  }
+
+  .shadow-sm, .shadow-md, .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  .border {
+    border-color: #cbd5e1 !important;
+  }
+}

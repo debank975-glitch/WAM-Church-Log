@@ -1,7 +1,8 @@
 // Church Financial Log - Core Application Script
-// Implements all 19 church accounting and stewardship requirements
+// Implements all 19 church accounting and stewardship requirements - World Ark Missions
 
-const STORAGE_KEY = 'CHURCH_FINANCIAL_LOG_V2';
+const STORAGE_KEY = 'WORLD_ARK_MISSIONS_LEDGER_V5';
+const SESSION_KEY = 'WORLD_ARK_MISSIONS_SESSION';
 
 // Master Initial State with comprehensive structure
 const DEFAULT_STATE = {
@@ -9,7 +10,7 @@ const DEFAULT_STATE = {
   currentTitheMonthOffset: 0, // 0 = current month, -1 = previous, etc.
   currentUser: {
     id: 'USR-001',
-    name: 'Pastor David Miller',
+    name: 'Reverend Benjamin Eturu Adom',
     role: 'Administrator',
     pin: '1234',
     isAdmin: true
@@ -17,11 +18,11 @@ const DEFAULT_STATE = {
   users: [
     {
       id: 'USR-001',
-      name: 'Pastor David Miller',
+      name: 'Reverend Benjamin Eturu Adom',
       role: 'Administrator',
       pin: '1234',
       isAdmin: true,
-      permissions: ['Log Income', 'Disburse Expenditures', 'Print Official Reports', 'Manage Users']
+      permissions: ['Log Income', 'Log Expenditure', 'Print Official Reports', 'Manage Users']
     },
     {
       id: 'USR-002',
@@ -29,7 +30,7 @@ const DEFAULT_STATE = {
       role: 'Finance Secretary',
       pin: '2345',
       isAdmin: false,
-      permissions: ['Log Income', 'Disburse Expenditures', 'Print Official Reports']
+      permissions: ['Log Income', 'Log Expenditure', 'Print Official Reports']
     },
     {
       id: 'USR-003',
@@ -49,10 +50,10 @@ const DEFAULT_STATE = {
     }
   ],
   churchInfo: {
-    name: 'Grace Community Church',
-    address: '425 Cornerstone Way, Springfield, IL 62701',
-    phone: '(555) 234-5678',
-    ein: 'XX-XXXXXXX (501(c)(3) Non-Profit)'
+    name: 'World Ark Missions',
+    address: 'Plot 12 Ark Avenue, Accra, Ghana',
+    phone: '+233 24 123 4567',
+    ein: 'WAM-GH-2026 (Non-Profit / NGO)'
   },
   categories: {
     INCOME: [
@@ -70,11 +71,19 @@ const DEFAULT_STATE = {
       },
       {
         name: 'Missions & Evangelism',
-        variants: ['Kenya Foreign Mission', 'Local Food Pantry Support', 'Prison Ministry Outreach']
+        variants: ['Northern Ghana Mission', 'Local Food Pantry Support', 'Prison Ministry Outreach']
       },
       {
         name: 'Special Thanksgiving & Seed',
         variants: ['Annual Harvest Seed', 'Child Dedication Thanksgiving', 'Wedding Thanksgiving']
+      },
+      {
+        name: 'Stewardship Goals',
+        variants: ['Sanctuary Sound Console', 'Harvest Goal Contributions', 'Community Food Drive']
+      },
+      {
+        name: 'Savings & Reserves',
+        variants: ['Savings Withdrawal', 'Reserve Transfer']
       }
     ],
     EXPENSE: [
@@ -100,11 +109,15 @@ const DEFAULT_STATE = {
       },
       {
         name: 'Administration & Office',
-        variants: ['Sunday Bulletin Printing', 'Accounting Software', 'Bank Service Charges', 'Postage']
+        variants: ['Sunday Bulletin Printing', 'Accounting Software', 'MoMo & Service Charges', 'Postage']
       },
       {
         name: 'Benevolence & Community',
         variants: ['Emergency Family Relief', 'Food Pantry Groceries', 'Shelter Assistance']
+      },
+      {
+        name: 'Stewardship Goals',
+        variants: ['Console Equipment Purchase', 'Outreach Logistics', 'Community Food Distribution']
       }
     ]
   },
@@ -115,36 +128,15 @@ const DEFAULT_STATE = {
     'Audio, Visual & Media': { monthly: 600, quarterly: 1800, yearly: 7200 },
     'Worship & Music': { monthly: 400, quarterly: 1200, yearly: 4800 },
     'Administration & Office': { monthly: 500, quarterly: 1500, yearly: 6000 },
-    'Benevolence & Community': { monthly: 800, quarterly: 2400, yearly: 9600 }
+    'Benevolence & Community': { monthly: 800, quarterly: 2400, yearly: 9600 },
+    'Stewardship Goals': { monthly: 1500, quarterly: 5000, yearly: 20000 }
   },
   savings: {
-    accounts: [
-      {
-        id: 'SAV-01',
-        name: 'Building & Capital Reserve',
-        balance: 24500.00,
-        target: 50000.00,
-        desc: 'Dedicated reserve for sanctuary expansion and facility upgrades'
-      },
-      {
-        id: 'SAV-02',
-        name: 'Emergency Welfare Fund',
-        balance: 12800.00,
-        target: 20000.00,
-        desc: 'Parishioner benevolent relief and disaster assistance fund'
-      },
-      {
-        id: 'SAV-03',
-        name: 'Youth & Education Endowment',
-        balance: 6200.00,
-        target: 15000.00,
-        desc: 'Camp scholarships and Christian education seed funding'
-      }
-    ],
+    totalBalance: 43500.00,
     history: [
-      { date: '2026-09-01', account: 'Building & Capital Reserve', amount: 1500.00, desc: 'Monthly surplus allocation' },
-      { date: '2026-08-01', account: 'Building & Capital Reserve', amount: 1200.00, desc: 'Monthly surplus allocation' },
-      { date: '2026-08-15', account: 'Emergency Welfare Fund', amount: 800.00, desc: 'Special benevolence transfer' }
+      { id: 'SAV-TX-1', date: '2026-09-01', type: 'DEPOSIT', amount: 1500.00, custody: 'Mobile Money Wallet', desc: 'Monthly operating surplus transfer' },
+      { id: 'SAV-TX-2', date: '2026-08-01', type: 'DEPOSIT', amount: 1200.00, custody: 'Mobile Money Wallet', desc: 'Surplus allocation' },
+      { id: 'SAV-TX-3', date: '2026-08-15', type: 'DEPOSIT', amount: 800.00, custody: 'Cash on Hand', desc: 'Emergency reserve contribution' }
     ]
   },
   goals: [
@@ -154,7 +146,8 @@ const DEFAULT_STATE = {
       interval: 'Quarterly',
       target: 8500.00,
       current: 6200.00,
-      category: 'Audio, Visual & Media'
+      spent: 4500.00,
+      custody: 'Mobile Money Wallet'
     },
     {
       id: 'GOL-02',
@@ -162,7 +155,8 @@ const DEFAULT_STATE = {
       interval: 'Yearly',
       target: 40000.00,
       current: 28400.00,
-      category: 'Special Thanksgiving & Seed'
+      spent: 12000.00,
+      custody: 'Mobile Money Wallet'
     },
     {
       id: 'GOL-03',
@@ -170,11 +164,12 @@ const DEFAULT_STATE = {
       interval: 'Monthly',
       target: 1200.00,
       current: 950.00,
-      category: 'Benevolence & Community'
+      spent: 700.00,
+      custody: 'Cash on Hand'
     }
   ],
   transactions: [
-    // Income Transactions (Requirement 14/15: custody Bank vs Cash on Hand; Req 16: description required)
+    // Income Transactions (Custody: Mobile Money Wallet vs Cash on Hand)
     {
       id: 'TX-INC-001',
       type: 'INCOME',
@@ -183,8 +178,8 @@ const DEFAULT_STATE = {
       variant: 'Sunday 1st Service Collection',
       entity: 'Sunday Congregation',
       amount: 2480.00,
-      custody: 'Bank', // Sent to Bank
-      description: 'First service open collection baskets deposited directly to church bank account.',
+      custody: 'Mobile Money Wallet',
+      description: 'First service open collection baskets deposited to church Mobile Money Wallet.',
       recordedBy: 'Deacon Robert Vance'
     },
     {
@@ -195,7 +190,7 @@ const DEFAULT_STATE = {
       variant: 'Sunday 2nd Service Collection',
       entity: 'Sunday Congregation',
       amount: 1940.00,
-      custody: 'Cash on Hand', // Cash in Safe
+      custody: 'Cash on Hand',
       description: 'Second service collection retained in vault safe for weekly operational needs.',
       recordedBy: 'Deacon Robert Vance'
     },
@@ -207,8 +202,8 @@ const DEFAULT_STATE = {
       variant: 'Sanctuary Expansion',
       entity: 'Elder Robert & Martha Vance',
       amount: 1500.00,
-      custody: 'Bank',
-      description: 'Pledge check #3021 for Phase 2 Sanctuary building wing expansion.',
+      custody: 'Mobile Money Wallet',
+      description: 'Pledge transfer for Phase 2 Sanctuary building wing expansion.',
       recordedBy: 'Elder Martha Clark'
     },
     {
@@ -216,15 +211,15 @@ const DEFAULT_STATE = {
       type: 'INCOME',
       date: '2026-09-09',
       category: 'Missions & Evangelism',
-      variant: 'Kenya Foreign Mission',
+      variant: 'Northern Ghana Mission',
       entity: 'Dr. Samuel & Grace Taylor',
       amount: 600.00,
-      custody: 'Bank',
-      description: 'Direct wire donation for rural medical outreach in Kenya.',
-      recordedBy: 'Pastor David Miller'
+      custody: 'Mobile Money Wallet',
+      description: 'Direct MoMo transfer donation for medical evangelism outreach.',
+      recordedBy: 'Reverend Benjamin Eturu Adom'
     },
 
-    // Tithes recorded via Tithe Page (Tithe entries update general ledger; eCash vs Physical)
+    // Tithes recorded via Tithe Page
     {
       id: 'TX-TITHE-20260907-1',
       type: 'INCOME',
@@ -237,7 +232,7 @@ const DEFAULT_STATE = {
       isECash: false, // Physical Cash
       custody: 'Cash on Hand',
       description: 'Tithe logged via Tithe Page [Physical Money]',
-      recordedBy: 'Pastor David Miller'
+      recordedBy: 'Reverend Benjamin Eturu Adom'
     },
     {
       id: 'TX-TITHE-20260907-2',
@@ -249,9 +244,9 @@ const DEFAULT_STATE = {
       entity: 'Michael Chen',
       amount: 750.00,
       isECash: true, // E-Cash
-      custody: 'Bank',
-      description: 'Tithe logged via Tithe Page [E-Cash / Electronic]',
-      recordedBy: 'Pastor David Miller'
+      custody: 'Mobile Money Wallet',
+      description: 'Tithe logged via Tithe Page [E-Cash / MoMo]',
+      recordedBy: 'Reverend Benjamin Eturu Adom'
     },
     {
       id: 'TX-TITHE-20260910-1',
@@ -263,22 +258,80 @@ const DEFAULT_STATE = {
       entity: 'Hannah O\'Connor',
       amount: 450.00,
       isECash: true, // E-Cash
-      custody: 'Bank',
-      description: 'Tithe logged via Tithe Page [E-Cash / Electronic]',
+      custody: 'Mobile Money Wallet',
+      description: 'Tithe logged via Tithe Page [E-Cash / MoMo]',
       recordedBy: 'Elder Martha Clark'
     },
 
-    // Expenses (Req 12: Split into variants; Req 16: description required)
+    // Goal Transactions (Requirement 14: Goals reflect in Income and Expenses)
+    {
+      id: 'TX-GOAL-INC-GOL-01',
+      type: 'INCOME',
+      isGoalSync: true,
+      goalId: 'GOL-01',
+      date: '2026-09-05',
+      category: 'Stewardship Goals',
+      variant: 'Sanctuary Sound Console',
+      entity: 'Stewardship Goal: New Sanctuary Audio Console',
+      amount: 6200.00,
+      custody: 'Mobile Money Wallet',
+      description: 'Stewardship goal funds raised for New Sanctuary Audio Console',
+      recordedBy: 'Reverend Benjamin Eturu Adom'
+    },
+    {
+      id: 'TX-GOAL-EXP-GOL-01',
+      type: 'EXPENSE',
+      isGoalSync: true,
+      goalId: 'GOL-01',
+      date: '2026-09-06',
+      category: 'Stewardship Goals',
+      variant: 'Console Equipment Purchase',
+      entity: 'Stewardship Goal: New Sanctuary Audio Console',
+      amount: 4500.00,
+      custody: 'Mobile Money Wallet',
+      description: 'Expenditure spent towards New Sanctuary Audio Console',
+      recordedBy: 'Reverend Benjamin Eturu Adom'
+    },
+    {
+      id: 'TX-GOAL-INC-GOL-03',
+      type: 'INCOME',
+      isGoalSync: true,
+      goalId: 'GOL-03',
+      date: '2026-09-02',
+      category: 'Stewardship Goals',
+      variant: 'Community Food Drive',
+      entity: 'Stewardship Goal: Monthly Community Food Pantry Drive',
+      amount: 950.00,
+      custody: 'Cash on Hand',
+      description: 'Stewardship goal funds raised for Monthly Community Food Pantry Drive',
+      recordedBy: 'Deacon Robert Vance'
+    },
+    {
+      id: 'TX-GOAL-EXP-GOL-03',
+      type: 'EXPENSE',
+      isGoalSync: true,
+      goalId: 'GOL-03',
+      date: '2026-09-04',
+      category: 'Stewardship Goals',
+      variant: 'Community Food Distribution',
+      entity: 'Stewardship Goal: Monthly Community Food Pantry Drive',
+      amount: 700.00,
+      custody: 'Cash on Hand',
+      description: 'Expenditure spent towards Monthly Community Food Pantry Drive',
+      recordedBy: 'Deacon Robert Vance'
+    },
+
+    // Expenses
     {
       id: 'TX-EXP-001',
       type: 'EXPENSE',
       date: '2026-09-03',
       category: 'Utilities',
       variant: 'Electricity',
-      entity: 'Midwest Electric Power Co.',
+      entity: 'Electricity Company of Ghana (ECG)',
       amount: 720.00,
-      custody: 'Bank',
-      description: 'Monthly electric bill for the main auditorium and administrative offices.',
+      custody: 'Mobile Money Wallet',
+      description: 'Monthly electric power for sanctuary auditorium and offices.',
       recordedBy: 'Elder Martha Clark'
     },
     {
@@ -287,10 +340,10 @@ const DEFAULT_STATE = {
       date: '2026-09-04',
       category: 'Utilities',
       variant: 'Water',
-      entity: 'Springfield Municipal Water',
+      entity: 'Ghana Water Company Ltd',
       amount: 185.50,
-      custody: 'Bank',
-      description: 'Municipal water and sanitation utilities for facility restrooms and kitchen.',
+      custody: 'Mobile Money Wallet',
+      description: 'Facility water supply and sanitation utilities.',
       recordedBy: 'Elder Martha Clark'
     },
     {
@@ -299,9 +352,9 @@ const DEFAULT_STATE = {
       date: '2026-09-05',
       category: 'Utilities',
       variant: 'Wifi & Internet',
-      entity: 'Comcast Business Fiber',
+      entity: 'MTN Business Fiber',
       amount: 149.99,
-      custody: 'Bank',
+      custody: 'Mobile Money Wallet',
       description: 'High-speed fiber line for livestreaming church worship services.',
       recordedBy: 'Elder Martha Clark'
     },
@@ -311,10 +364,10 @@ const DEFAULT_STATE = {
       date: '2026-09-05',
       category: 'Pastoral & Personnel',
       variant: 'Senior Pastor Stipend',
-      entity: 'Pastor David Miller',
+      entity: 'Reverend Benjamin Eturu Adom',
       amount: 3200.00,
-      custody: 'Bank',
-      description: 'Semi-monthly pastoral payroll and ministry housing allowance.',
+      custody: 'Mobile Money Wallet',
+      description: 'Monthly pastoral ministry honorarium and allowance.',
       recordedBy: 'Elder Martha Clark'
     },
     {
@@ -323,10 +376,10 @@ const DEFAULT_STATE = {
       date: '2026-09-08',
       category: 'Benevolence & Community',
       variant: 'Food Pantry Groceries',
-      entity: 'Aldi Wholesale Foods',
+      entity: 'Local Community Market',
       amount: 420.00,
       custody: 'Cash on Hand',
-      description: 'Purchased dry staples, canned goods, and baby supplies for community pantry distribution.',
+      description: 'Purchased dry staples and groceries for community pantry distribution.',
       recordedBy: 'Deacon Robert Vance'
     },
     {
@@ -335,17 +388,17 @@ const DEFAULT_STATE = {
       date: '2026-09-11',
       category: 'Audio, Visual & Media',
       variant: 'Soundboard Cables & Mics',
-      entity: 'Sweetwater Sound Inc.',
+      entity: 'Acoustic Sound Supplies',
       amount: 310.00,
-      custody: 'Bank',
-      description: 'Two Shure SM58 microphone replacements and four high-grade 50ft XLR stage cables.',
+      custody: 'Mobile Money Wallet',
+      description: 'Stage microphone cables and accessories.',
       recordedBy: 'Elder Martha Clark'
     }
   ]
 };
 
 // Global active state
-let appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let appState = createFreshFinancialState();
 
 // Chart.js instances
 let chartIncomePieInstance = null;
@@ -356,6 +409,25 @@ let pendingConfirmCallback = null;
 
 // Selected date for tithe modal
 let activeTitheDayDate = null;
+let pendingTitheEntries = [];
+
+function createFreshFinancialState() {
+  const freshState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  freshState.budgets = Object.fromEntries(
+    Object.keys(freshState.budgets || {}).map(category => [
+      category,
+      { monthly: 0, quarterly: 0, yearly: 0 }
+    ])
+  );
+  freshState.savings = { totalBalance: 0, history: [] };
+  freshState.goals = [];
+  freshState.transactions = [];
+  freshState.currentInterval = 'monthly';
+  freshState.currentTitheMonthOffset = 0;
+  freshState.currentUser = JSON.parse(JSON.stringify(DEFAULT_STATE.currentUser));
+  freshState.users = JSON.parse(JSON.stringify(DEFAULT_STATE.users));
+  return freshState;
+}
 
 // -------------------------------------------------------------
 // APP INITIALIZATION
@@ -364,9 +436,58 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAppState();
   setupUserSession();
   setupIntervalUI();
+  moveChartsToPage();
   initPieCharts();
   renderCurrentPage();
   lucide.createIcons();
+});
+
+function moveChartsToPage() {
+  const chartsPanel = document.getElementById('chartsPanel');
+  const chartsPage = document.getElementById('page-charts');
+  if (chartsPanel && chartsPage && chartsPanel.parentElement !== chartsPage) {
+    chartsPage.appendChild(chartsPanel);
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!sidebar || !backdrop) return;
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  if (isMobile) {
+    sidebar.classList.toggle('sidebar-open');
+    backdrop.classList.toggle('hidden', !sidebar.classList.contains('sidebar-open'));
+    document.body.classList.toggle('sidebar-locked', sidebar.classList.contains('sidebar-open'));
+  } else {
+    sidebar.classList.toggle('sidebar-collapsed');
+    document.body.classList.toggle('sidebar-collapsed-page', sidebar.classList.contains('sidebar-collapsed'));
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!sidebar || !backdrop) return;
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  if (isMobile) {
+    sidebar.classList.remove('sidebar-open');
+  } else {
+    sidebar.classList.add('sidebar-collapsed');
+    document.body.classList.add('sidebar-collapsed-page');
+  }
+  backdrop.classList.add('hidden');
+  document.body.classList.remove('sidebar-locked');
+}
+
+window.addEventListener('resize', () => {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+  if (!window.matchMedia('(max-width: 767px)').matches) {
+    sidebar.classList.remove('sidebar-open');
+    document.getElementById('sidebarBackdrop')?.classList.add('hidden');
+    document.body.classList.remove('sidebar-locked');
+  }
 });
 
 function loadAppState() {
@@ -381,14 +502,58 @@ function loadAppState() {
       if (!appState.categories) {
         appState.categories = DEFAULT_STATE.categories;
       }
+      if (!appState.goals) {
+        appState.goals = DEFAULT_STATE.goals;
+      }
+      normalizeState();
     } catch (e) {
       console.error('Failed to parse stored state, using defaults', e);
-      appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      appState = createFreshFinancialState();
     }
   } else {
-    appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    appState = createFreshFinancialState();
+    normalizeState();
     saveAppState();
   }
+}
+
+function normalizeState() {
+  appState.currentInterval = appState.currentInterval || 'monthly';
+  appState.budgets = appState.budgets || {};
+  appState.categories = appState.categories || JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
+  appState.currentUser = appState.currentUser || JSON.parse(JSON.stringify(DEFAULT_STATE.currentUser));
+  appState.savings = appState.savings || { totalBalance: 0, history: [] };
+  if (!Array.isArray(appState.savings.history)) appState.savings.history = [];
+
+  // Migrate the earlier account-based savings shape into the consolidated model.
+  if (Array.isArray(appState.savings.accounts)) {
+    appState.savings.totalBalance = appState.savings.accounts.reduce((sum, account) => sum + (Number(account.balance) || 0), 0);
+    appState.savings.history = appState.savings.history.map((record, index) => ({
+      id: record.id || `SAV-MIGRATED-${index + 1}`,
+      date: record.date || new Date().toISOString().split('T')[0],
+      type: record.type || 'DEPOSIT',
+      amount: Number(record.amount) || 0,
+      custody: record.custody || 'Cash on Hand',
+      desc: record.desc || record.description || 'Savings record'
+    }));
+    delete appState.savings.accounts;
+  }
+
+  appState.savings.totalBalance = Number(appState.savings.totalBalance) || 0;
+  appState.goals = (appState.goals || []).map(goal => ({
+    ...goal,
+    current: Number(goal.current) || 0,
+    spent: Number(goal.spent) || 0,
+    custody: goal.custody || 'Mobile Money Wallet'
+  }));
+  appState.transactions = (appState.transactions || []).map(transaction => ({
+    ...transaction,
+    amount: Number(transaction.amount) || 0,
+    entity: transaction.entity || 'Unspecified',
+    category: transaction.category || 'Uncategorized',
+    recordedBy: transaction.recordedBy || 'Unknown user',
+    custody: transaction.custody === 'Bank' ? 'Mobile Money Wallet' : (transaction.custody || 'Cash on Hand')
+  }));
 }
 
 function saveAppState() {
@@ -401,6 +566,9 @@ function saveAppState() {
 function setupUserSession() {
   updateUserUI();
   populateLoginUserDropdown();
+  if (!sessionStorage.getItem(SESSION_KEY)) {
+    document.getElementById('authOverlay')?.classList.remove('hidden');
+  }
 }
 
 function updateUserUI() {
@@ -444,6 +612,7 @@ function handleLogin() {
   }
 
   appState.currentUser = selectedUser;
+  sessionStorage.setItem(SESSION_KEY, 'authenticated');
   document.getElementById('authOverlay').classList.add('hidden');
   pinInput.value = '';
   updateUserUI();
@@ -457,6 +626,7 @@ function handleSignOut() {
     'Sign Out',
     'Are you sure you want to sign out and lock the financial ledger?',
     () => {
+      sessionStorage.removeItem(SESSION_KEY);
       document.getElementById('authOverlay').classList.remove('hidden');
       populateLoginUserDropdown();
     },
@@ -478,6 +648,7 @@ function navigateTo(pageId) {
   }
 
   activePage = pageId;
+  if (window.matchMedia('(max-width: 767px)').matches) closeSidebar();
 
   // Toggle page visibility
   document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
@@ -505,8 +676,9 @@ function renderCurrentPage() {
   if (activePage === 'home') {
     renderHomeMetrics();
     renderLedgerTable();
+  } else if (activePage === 'charts') {
     updatePieCharts();
-  } else if (activePage === 'budget') {
+  } else if (activePage === 'quota') {
     renderBudgetPage();
   } else if (activePage === 'tithe') {
     renderTitheCalendar();
@@ -546,9 +718,16 @@ function setupIntervalUI() {
 
   const labelEl = document.getElementById('activeIntervalLabel');
   if (labelEl) {
-    if (current === 'monthly') labelEl.innerText = 'September 2026';
-    else if (current === 'quarterly') labelEl.innerText = 'Q3 2026 (Jul - Sep)';
-    else labelEl.innerText = 'Fiscal Year 2026';
+    const now = new Date();
+    const month = now.toLocaleString('en-US', { month: 'long' });
+    const year = now.getFullYear();
+    if (current === 'monthly') labelEl.innerText = `${month} ${year}`;
+    else if (current === 'quarterly') {
+      const quarter = Math.floor(now.getMonth() / 3) + 1;
+      const startMonth = new Date(year, (quarter - 1) * 3, 1).toLocaleString('en-US', { month: 'short' });
+      const endMonth = new Date(year, quarter * 3 - 1, 1).toLocaleString('en-US', { month: 'short' });
+      labelEl.innerText = `Q${quarter} ${year} (${startMonth} - ${endMonth})`;
+    } else labelEl.innerText = `Fiscal Year ${year}`;
   }
 }
 
@@ -556,15 +735,18 @@ function setupIntervalUI() {
 function matchesActiveInterval(dateStr) {
   if (!dateStr) return false;
   const current = appState.currentInterval;
-  
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
   if (current === 'monthly') {
-    return dateStr.startsWith('2026-09');
+    return dateStr.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`);
   } else if (current === 'quarterly') {
-    // Q3: 07, 08, 09
-    return dateStr.startsWith('2026-07') || dateStr.startsWith('2026-08') || dateStr.startsWith('2026-09');
+    const quarterStart = Math.floor(month / 3) * 3;
+    const date = new Date(`${dateStr}T00:00:00`);
+    return date.getFullYear() === year && date.getMonth() >= quarterStart && date.getMonth() < quarterStart + 3;
   } else {
-    // Yearly
-    return dateStr.startsWith('2026');
+    return dateStr.startsWith(`${year}`);
   }
 }
 
@@ -577,13 +759,13 @@ function updateQuotaBadge() {
   // Calculate total budget for this interval
   let totalBudget = 0;
   Object.keys(appState.budgets).forEach(cat => {
-    totalBudget += appState.budgets[cat][interval] || 0;
+    totalBudget += Number(appState.budgets[cat]?.[interval]) || 0;
   });
 
   // Calculate total expenses for this interval
   let totalExpenses = 0;
   appState.transactions.filter(tx => tx.type === 'EXPENSE' && matchesActiveInterval(tx.date)).forEach(tx => {
-    totalExpenses += tx.amount;
+    totalExpenses += Number(tx.amount) || 0;
   });
 
   const pct = totalBudget > 0 ? Math.round((totalExpenses / totalBudget) * 100) : 0;
@@ -623,13 +805,13 @@ function updateQuotaBadge() {
       banner.className = 'p-4 rounded-2xl border flex items-center justify-between shadow-sm bg-rose-50 border-rose-200 text-rose-900';
       bannerIcon.className = 'w-10 h-10 rounded-xl flex items-center justify-center bg-rose-100 text-rose-600';
       bannerTitle.innerText = 'OVER QUOTA ALERT!';
-      bannerSub.innerText = `Expenses (${formatUSD(totalExpenses)}) have EXCEEDED the approved ${interval} quota of ${formatUSD(totalBudget)}!`;
+      bannerSub.innerText = `Expenditure (${formatUSD(totalExpenses)}) has EXCEEDED the approved ${interval} quota of ${formatUSD(totalBudget)}!`;
       bannerPct.className = 'text-xl font-black font-mono text-rose-600';
     } else if (pct >= 80) {
       banner.className = 'p-4 rounded-2xl border flex items-center justify-between shadow-sm bg-amber-50 border-amber-200 text-amber-900';
       bannerIcon.className = 'w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100 text-amber-600';
       bannerTitle.innerText = 'Quota Warning: Nearing Budget Limit';
-      bannerSub.innerText = `${pct}% of the ${interval} budget limit (${formatUSD(totalBudget)}) has been disbursed.`;
+      bannerSub.innerText = `${pct}% of the ${interval} budget limit (${formatUSD(totalBudget)}) has been used.`;
       bannerPct.className = 'text-xl font-black font-mono text-amber-600';
     } else {
       banner.className = 'p-4 rounded-2xl border flex items-center justify-between shadow-sm bg-emerald-50 border-emerald-200 text-emerald-900';
@@ -658,11 +840,11 @@ function renderHomeMetrics() {
   currentTxs.forEach(tx => {
     if (tx.type === 'INCOME') {
       totalIncome += tx.amount;
-      if (tx.custody === 'Bank') bankIncome += tx.amount;
+      if (tx.custody === 'Mobile Money Wallet') bankIncome += tx.amount;
       else cashIncome += tx.amount;
     } else {
       totalExpenses += tx.amount;
-      if (tx.custody === 'Bank') bankExpense += tx.amount;
+      if (tx.custody === 'Mobile Money Wallet') bankExpense += tx.amount;
       else cashExpense += tx.amount;
     }
   });
@@ -679,8 +861,8 @@ function renderHomeMetrics() {
   document.getElementById('cardCashOnHand').innerText = formatUSD(netCash);
 
   const subtextInterval = appState.currentInterval.toUpperCase();
-  document.getElementById('cardIncomeSubtext').innerText = `${subtextInterval} total receipts`;
-  document.getElementById('cardExpenseSubtext').innerText = `${subtextInterval} disbursements`;
+  document.getElementById('cardIncomeSubtext').innerText = `${subtextInterval} total income`;
+  document.getElementById('cardExpenseSubtext').innerText = `${subtextInterval} total expenditure`;
   document.getElementById('cardBalanceSubtext').innerText = `${subtextInterval} operating reserve`;
 }
 
@@ -749,10 +931,14 @@ function updatePieCharts() {
 
   const incLabels = Object.keys(incomeCatMap);
   const incValues = Object.values(incomeCatMap);
+  const incomeTotal = incValues.reduce((sum, value) => sum + value, 0);
 
   chartIncomePieInstance.data.labels = incLabels.length > 0 ? incLabels : ['No data'];
   chartIncomePieInstance.data.datasets[0].data = incValues.length > 0 ? incValues : [1];
   chartIncomePieInstance.update();
+  const incomeTotalText = formatUSD(incomeTotal);
+  document.getElementById('chartIncomeTotalBadge').innerText = incomeTotalText;
+  document.getElementById('chartIncomeCenterValue').innerText = incomeTotalText;
 
   // Populate Income Legend
   const incLegend = document.getElementById('legendIncomePie');
@@ -778,10 +964,14 @@ function updatePieCharts() {
 
   const expLabels = Object.keys(expenseCatMap);
   const expValues = Object.values(expenseCatMap);
+  const expenseTotal = expValues.reduce((sum, value) => sum + value, 0);
 
   chartExpensePieInstance.data.labels = expLabels.length > 0 ? expLabels : ['No data'];
   chartExpensePieInstance.data.datasets[0].data = expValues.length > 0 ? expValues : [1];
   chartExpensePieInstance.update();
+  const expenseTotalText = formatUSD(expenseTotal);
+  document.getElementById('chartExpenseTotalBadge').innerText = expenseTotalText;
+  document.getElementById('chartExpenseCenterValue').innerText = expenseTotalText;
 
   // Populate Expense Legend
   const expLegend = document.getElementById('legendExpensePie');
@@ -836,14 +1026,15 @@ function renderLedgerTable() {
   filtered.forEach(tx => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+    tr.title = `Recorded by: ${tx.recordedBy || 'Unknown user'}`;
 
     const isInc = tx.type === 'INCOME';
     const typeBadge = isInc
       ? '<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 text-[10px]">Income</span>'
-      : '<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200 text-[10px]">Disbursement</span>';
+      : '<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200 text-[10px]">Expenditure</span>';
 
-    const custodyBadge = tx.custody === 'Bank'
-      ? '<span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-mono font-bold">Bank</span>'
+    const custodyBadge = tx.custody === 'Mobile Money Wallet'
+      ? '<span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-mono font-bold">Mobile Money</span>'
       : '<span class="text-[10px] bg-accent-50 text-accent-700 px-2 py-0.5 rounded font-mono font-bold">Cash on Hand</span>';
 
     const amountFormatted = isInc ? `+${formatUSD(tx.amount)}` : `-${formatUSD(tx.amount)}`;
@@ -989,7 +1180,7 @@ function handleExpenseFormSubmit(e) {
   }
 
   showConfirmation(
-    'Commit Expense Disbursement',
+    'Commit Expenditure Entry',
     `Disburse ${formatUSD(amount)} for ${entity} under ${category} (${variant})?`,
     () => {
       const id = `TX-EXP-${Date.now()}`;
@@ -1095,14 +1286,7 @@ function renderTitheCalendar() {
     const dayTithes = appState.transactions.filter(t => t.isTithe && t.date === dayStr);
     
     let dayTotal = 0;
-    let dayHasECash = false;
-    let dayHasPhysical = false;
-
-    dayTithes.forEach(t => {
-      dayTotal += t.amount;
-      if (t.isECash) dayHasECash = true;
-      else dayHasPhysical = true;
-    });
+    dayTithes.forEach(t => { dayTotal += t.amount; });
 
     const isToday = (day === now.getDate() && month === now.getMonth() && year === now.getFullYear());
 
@@ -1114,16 +1298,6 @@ function renderTitheCalendar() {
 
     card.onclick = () => openTitheDayModal(dayStr);
 
-    let badgeHtml = '';
-    if (dayTithes.length > 0) {
-      badgeHtml = `
-        <div class="mt-1 flex items-center justify-center space-x-1">
-          ${dayHasPhysical ? '<span class="text-[9px] bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Cash</span>' : ''}
-          ${dayHasECash ? '<span class="text-[9px] bg-accent-200 text-accent-900 px-1.5 py-0.5 rounded font-bold">E-Cash</span>' : ''}
-        </div>
-      `;
-    }
-
     card.innerHTML = `
       <div class="flex items-center justify-between text-[11px] font-bold text-slate-400">
         <span>Day</span>
@@ -1133,7 +1307,6 @@ function renderTitheCalendar() {
       <div class="my-auto">
         <div class="text-xl font-black text-slate-800">${day}</div>
         ${dayTotal > 0 ? `<div class="text-xs font-black text-emerald-700 font-mono">${formatUSD(dayTotal)}</div>` : '<div class="text-[10px] text-slate-400">No Tithes</div>'}
-        ${badgeHtml}
       </div>
 
       <!-- Date of current month under the box (Requirement 17) -->
@@ -1148,11 +1321,16 @@ function renderTitheCalendar() {
 
 function openTitheDayModal(dayDateStr) {
   activeTitheDayDate = dayDateStr;
+  pendingTitheEntries = [];
   document.getElementById('titheModalDayTitle').innerText = `Tithes for ${dayDateStr}`;
   
   // Render existing tithes for this day
   const listContainer = document.getElementById('titheDayExistingList');
   const dayTithes = appState.transactions.filter(t => t.isTithe && t.date === dayDateStr);
+  const dayTotalBadge = document.getElementById('titheDayTotalBadge');
+  if (dayTotalBadge) {
+    dayTotalBadge.innerText = formatUSD(dayTithes.reduce((sum, entry) => sum + entry.amount, 0));
+  }
 
   listContainer.innerHTML = '';
   if (dayTithes.length === 0) {
@@ -1184,12 +1362,13 @@ function openTitheDayModal(dayDateStr) {
   document.getElementById('titheAmount').value = '';
   document.getElementById('titheIsTithe').checked = true;
   document.getElementById('titheIsECash').checked = false;
+  renderPendingTitheEntries();
 
   openModal('modalTitheDay');
   lucide.createIcons();
 }
 
-function saveDayTitheEntry() {
+function queueDayTitheEntry() {
   const donor = document.getElementById('titheDonorName').value.trim();
   const amount = parseFloat(document.getElementById('titheAmount').value);
   const isECash = document.getElementById('titheIsECash').checked;
@@ -1199,32 +1378,66 @@ function saveDayTitheEntry() {
     return;
   }
 
-  showConfirmation(
-    'Save Tithe Entry',
-    `Record tithe of ${formatUSD(amount)} from ${donor} on ${activeTitheDayDate} (${isECash ? 'E-Cash' : 'Physical Money'})? This will immediately update the general ledger.`,
-    () => {
-      const id = `TX-TITHE-${activeTitheDayDate.replace(/-/g, '')}-${Date.now().toString().slice(-4)}`;
-      
-      // Update general ledger immediately (Requirement 17)
-      appState.transactions.unshift({
-        id,
-        type: 'INCOME',
-        isTithe: true,
-        date: activeTitheDayDate,
-        category: 'Tithes & Covenant Giving',
-        variant: 'General Tithes',
-        entity: donor,
-        amount,
-        isECash,
-        custody: isECash ? 'Bank' : 'Cash on Hand',
-        description: `Tithe logged for ${activeTitheDayDate} [${isECash ? 'E-Cash' : 'Physical Money'}]`,
-        recordedBy: appState.currentUser.name
-      });
+  pendingTitheEntries.push({ donor, amount, isECash });
+  document.getElementById('titheDonorName').value = '';
+  document.getElementById('titheAmount').value = '';
+  document.getElementById('titheIsECash').checked = false;
+  renderPendingTitheEntries();
+}
 
+function renderPendingTitheEntries() {
+  const container = document.getElementById('tithePendingList');
+  if (!container) return;
+  if (!pendingTitheEntries.length) {
+    container.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+  container.classList.remove('hidden');
+  container.innerHTML = `<div class="font-bold text-amber-900">Pending entries (${pendingTitheEntries.length})</div>` +
+    pendingTitheEntries.map((entry, index) => `
+      <div class="flex items-center justify-between text-[11px]">
+        <span>${entry.donor} - ${formatUSD(entry.amount)} (${entry.isECash ? 'E-Cash' : 'Physical Money'})</span>
+        <button type="button" onclick="removePendingTitheEntry(${index})" class="text-rose-600 font-bold">Remove</button>
+      </div>
+    `).join('');
+}
+
+function removePendingTitheEntry(index) {
+  pendingTitheEntries.splice(index, 1);
+  renderPendingTitheEntries();
+}
+
+function saveDayTitheEntries() {
+  if (!pendingTitheEntries.length) {
+    queueDayTitheEntry();
+    if (!pendingTitheEntries.length) return;
+  }
+  const entries = [...pendingTitheEntries];
+  showConfirmation(
+    'Save Tithe Entries',
+    `Save ${entries.length} tithe entr${entries.length === 1 ? 'y' : 'ies'} for ${activeTitheDayDate} to the general ledger?`,
+    () => {
+      entries.forEach((entry, index) => {
+        appState.transactions.unshift({
+          id: `TX-TITHE-${activeTitheDayDate.replace(/-/g, '')}-${Date.now()}-${index}`,
+          type: 'INCOME',
+          isTithe: true,
+          date: activeTitheDayDate,
+          category: 'Tithes & Covenant Giving',
+          variant: 'General Tithes',
+          entity: entry.donor,
+          amount: entry.amount,
+          isECash: entry.isECash,
+          custody: entry.isECash ? 'Mobile Money Wallet' : 'Cash on Hand',
+          description: `Tithe logged for ${activeTitheDayDate} [${entry.isECash ? 'E-Cash' : 'Physical Money'}]`,
+          recordedBy: appState.currentUser.name
+        });
+      });
+      pendingTitheEntries = [];
       saveAppState();
       renderCurrentPage();
       closeModal('modalTitheDay');
-      alert(`Tithe of ${formatUSD(amount)} saved and General Ledger updated!`);
     }
   );
 }
@@ -1241,8 +1454,8 @@ function renderBudgetPage() {
   const expenseCats = appState.categories.EXPENSE;
 
   expenseCats.forEach(cat => {
-    const quotaObj = appState.budgets[cat.name] || { monthly: 1000, quarterly: 3000, yearly: 12000 };
-    const quotaAmount = quotaObj[interval] || 1000;
+    const quotaObj = appState.budgets[cat.name] || { monthly: 0, quarterly: 0, yearly: 0 };
+    const quotaAmount = Number(quotaObj[interval]) || 0;
 
     // Calculate actual spent for this category during interval
     let spent = 0;
@@ -1304,7 +1517,7 @@ function renderBudgetPage() {
             <span class="font-bold text-slate-900 font-mono">${formatUSD(quotaAmount)}</span>
           </div>
           <div class="flex justify-between text-slate-500">
-            <span>Actual Disbursed:</span>
+            <span>Actual Expenditure:</span>
             <span class="font-bold text-rose-600 font-mono">${formatUSD(spent)}</span>
           </div>
           <div class="flex justify-between text-slate-500">
@@ -1360,58 +1573,54 @@ function handleBudgetSubmit(e) {
 // SAVINGS MODULE (Requirement 11)
 // -------------------------------------------------------------
 function renderSavingsPage() {
-  const accountsContainer = document.getElementById('savingsAccountsList');
-  if (!accountsContainer) return;
+  const savings = appState.savings;
+  const history = savings.history;
+  const totalEl = document.getElementById('savingsGrandTotal');
+  const countEl = document.getElementById('savingsRecordCount');
+  const tbody = document.getElementById('savingsHistoryTableBody');
+  if (!totalEl || !tbody) return;
 
-  let grandTotal = 0;
-  let buildingTotal = 0;
-  let emergencyTotal = 0;
+  totalEl.innerText = formatUSD(savings.totalBalance);
+  if (countEl) countEl.innerText = `${history.length} record${history.length === 1 ? '' : 's'}`;
+  const availableEl = document.getElementById('savingsWithdrawAvailable');
+  if (availableEl) availableEl.innerText = formatUSD(savings.totalBalance);
 
-  appState.savings.accounts.forEach(acc => {
-    grandTotal += acc.balance;
-    if (acc.name.includes('Building')) buildingTotal += acc.balance;
-    if (acc.name.includes('Emergency') || acc.name.includes('Welfare')) emergencyTotal += acc.balance;
-  });
-
-  document.getElementById('savingsGrandTotal').innerText = formatUSD(grandTotal);
-  document.getElementById('savingsBuildingTotal').innerText = formatUSD(buildingTotal);
-  document.getElementById('savingsEmergencyTotal').innerText = formatUSD(emergencyTotal);
-
-  accountsContainer.innerHTML = '';
-  appState.savings.accounts.forEach(acc => {
-    const pct = acc.target > 0 ? Math.min(Math.round((acc.balance / acc.target) * 100), 100) : 0;
-    const card = document.createElement('div');
-    card.className = 'bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3';
-    card.innerHTML = `
-      <div class="flex justify-between items-start">
-        <div>
-          <h4 class="font-bold text-slate-900 text-sm">${acc.name}</h4>
-          <p class="text-[11px] text-slate-500">${acc.desc}</p>
-        </div>
-        <div class="text-right">
-          <span class="font-black text-teal-800 font-mono text-base">${formatUSD(acc.balance)}</span>
-          <span class="text-[10px] text-slate-400 block">Target: ${formatUSD(acc.target)}</span>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between text-[11px] text-slate-500 mb-1">
-          <span>Fund Target Completion</span>
-          <span class="font-bold text-teal-700 font-mono">${pct}%</span>
-        </div>
-        <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-          <div class="bg-teal-600 h-full rounded-full" style="width: ${pct}%"></div>
-        </div>
-      </div>
+  tbody.innerHTML = history.length ? history.map(record => {
+    const isDeposit = record.type === 'DEPOSIT';
+    const isAdjustment = record.type === 'ADJUSTMENT';
+    return `
+      <tr>
+        <td class="py-3 px-4 font-mono text-slate-500">${record.date}</td>
+        <td class="py-3 px-4">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isDeposit ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+            ${isAdjustment ? 'Adjustment' : (isDeposit ? 'Deposit' : 'Withdrawal')}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-slate-700">${record.desc || '-'}</td>
+        <td class="py-3 px-4 text-slate-600">${record.custody || 'Cash on Hand'}</td>
+        <td class="py-3 px-4 text-right font-mono font-bold ${isDeposit ? 'text-emerald-600' : 'text-amber-600'}">
+          ${isAdjustment ? '' : (isDeposit ? '+' : '-')}${formatUSD(record.amount)}
+        </td>
+        <td class="py-3 px-4 text-center whitespace-nowrap">
+          <button onclick="openEditSavingsRecordModal('${record.id}')" class="p-1.5 text-slate-400 hover:text-teal-600 rounded-lg" title="Edit record">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="deleteSavingsRecord('${record.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg" title="Delete record">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </td>
+      </tr>
     `;
-    accountsContainer.appendChild(card);
-  });
+  }).join('') : `
+    <tr><td colspan="6" class="py-8 text-center text-slate-400">No savings records yet.</td></tr>
+  `;
+  lucide.createIcons();
 }
 
 function handleSavingsDepositSubmit(e) {
   e.preventDefault();
-  const accName = document.getElementById('savingsTargetAccount').value;
   const amount = parseFloat(document.getElementById('savingsDepositAmount').value);
+  const custody = document.getElementById('savingsDepositCustody').value;
   const desc = document.getElementById('savingsDepositDesc').value.trim() || 'Savings deposit';
 
   if (isNaN(amount) || amount <= 0) {
@@ -1421,16 +1630,15 @@ function handleSavingsDepositSubmit(e) {
 
   showConfirmation(
     'Confirm Savings Deposit',
-    `Transfer ${formatUSD(amount)} into ${accName}?`,
+    `Transfer ${formatUSD(amount)} into consolidated church savings?`,
     () => {
-      const targetAcc = appState.savings.accounts.find(a => a.name === accName);
-      if (targetAcc) {
-        targetAcc.balance += amount;
-      }
+      appState.savings.totalBalance += amount;
       appState.savings.history.unshift({
+        id: `SAV-${Date.now()}`,
         date: new Date().toISOString().split('T')[0],
-        account: accName,
+        type: 'DEPOSIT',
         amount,
+        custody,
         desc
       });
       saveAppState();
@@ -1440,25 +1648,211 @@ function handleSavingsDepositSubmit(e) {
   );
 }
 
+function handleSavingsWithdrawSubmit(e) {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('savingsWithdrawAmount').value);
+  const custody = document.getElementById('savingsWithdrawCustody').value;
+  const desc = document.getElementById('savingsWithdrawDesc').value.trim();
+
+  if (isNaN(amount) || amount <= 0 || !desc) {
+    alert('Please enter a valid withdrawal amount and reason.');
+    return;
+  }
+  if (amount > appState.savings.totalBalance) {
+    alert('Withdrawal cannot exceed the available savings balance.');
+    return;
+  }
+
+  showConfirmation('Confirm Savings Withdrawal', `Withdraw ${formatUSD(amount)} into operating income?`, () => {
+    appState.savings.totalBalance -= amount;
+    const savingsRecordId = `SAV-${Date.now()}`;
+    appState.savings.history.unshift({
+      id: savingsRecordId,
+      date: new Date().toISOString().split('T')[0],
+      type: 'WITHDRAWAL',
+      amount,
+      custody,
+      desc
+    });
+    appState.transactions.unshift({
+      id: `TX-SAV-${Date.now()}`,
+      savingsRecordId,
+      type: 'INCOME',
+      date: new Date().toISOString().split('T')[0],
+      category: 'Savings & Reserves',
+      variant: 'Savings Withdrawal',
+      entity: 'Church Savings Reserve',
+      amount,
+      custody,
+      description: desc,
+      recordedBy: appState.currentUser.name
+    });
+    saveAppState();
+    renderCurrentPage();
+    closeModal('modalWithdrawSavings');
+    e.target.reset();
+  });
+}
+
+function openEditSavingsRecordModal(recordId) {
+  const record = appState.savings.history.find(item => item.id === recordId);
+  if (!record) return;
+  document.getElementById('editSavingsRecId').value = record.id;
+  document.getElementById('editSavingsRecDate').value = record.date;
+  document.getElementById('editSavingsRecType').value = record.type;
+  document.getElementById('editSavingsRecAmount').value = record.amount;
+  document.getElementById('editSavingsRecCustody').value = record.custody;
+  document.getElementById('editSavingsRecDesc').value = record.desc || '';
+  openModal('modalEditSavingsRecord');
+}
+
+function handleEditSavingsRecordSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById('editSavingsRecId').value;
+  const index = appState.savings.history.findIndex(item => item.id === id);
+  if (index < 0) return;
+  const updated = {
+    id,
+    date: document.getElementById('editSavingsRecDate').value,
+    type: document.getElementById('editSavingsRecType').value,
+    amount: parseFloat(document.getElementById('editSavingsRecAmount').value),
+    custody: document.getElementById('editSavingsRecCustody').value,
+    desc: document.getElementById('editSavingsRecDesc').value.trim() || 'Savings record'
+  };
+  if (!updated.date || isNaN(updated.amount) || updated.amount <= 0) {
+    alert('Please enter valid savings record details.');
+    return;
+  }
+
+  showConfirmation('Update Savings Record', 'Save these changes to the savings activity history?', () => {
+    const old = appState.savings.history[index];
+    if (old.type === 'ADJUSTMENT' || updated.type === 'ADJUSTMENT') {
+      alert('Adjustment records are not editable. Use the balance adjustment action instead.');
+      return;
+    }
+    appState.savings.totalBalance += (updated.type === 'DEPOSIT' ? updated.amount : -updated.amount)
+      - (old.type === 'DEPOSIT' ? old.amount : -old.amount);
+    if (appState.savings.totalBalance < 0) {
+      alert('This update would make the savings balance negative.');
+      return;
+    }
+    appState.savings.history[index] = updated;
+    const linkedIndex = appState.transactions.findIndex(transaction => transaction.savingsRecordId === id);
+    if (updated.type === 'WITHDRAWAL') {
+      const linkedTransaction = {
+        id: `TX-SAV-${id}`,
+        savingsRecordId: id,
+        type: 'INCOME',
+        date: updated.date,
+        category: 'Savings & Reserves',
+        variant: 'Savings Withdrawal',
+        entity: 'Church Savings Reserve',
+        amount: updated.amount,
+        custody: updated.custody,
+        description: updated.desc,
+        recordedBy: appState.currentUser.name
+      };
+      if (linkedIndex >= 0) appState.transactions[linkedIndex] = linkedTransaction;
+      else appState.transactions.unshift(linkedTransaction);
+    } else if (linkedIndex >= 0) {
+      appState.transactions.splice(linkedIndex, 1);
+    }
+    saveAppState();
+    renderSavingsPage();
+    closeModal('modalEditSavingsRecord');
+  });
+}
+
+function deleteSavingsRecord(recordId) {
+  const index = appState.savings.history.findIndex(item => item.id === recordId);
+  if (index < 0) return;
+  const record = appState.savings.history[index];
+  showConfirmation('Delete Savings Record', `Delete this ${record.type.toLowerCase()} record for ${formatUSD(record.amount)}?`, () => {
+    if (record.type === 'ADJUSTMENT') {
+      alert('Adjustment records cannot be deleted because they establish the reconciled balance.');
+      return;
+    }
+    appState.savings.totalBalance -= record.type === 'DEPOSIT' ? record.amount : -record.amount;
+    appState.savings.history.splice(index, 1);
+    if (record.type === 'WITHDRAWAL') {
+      appState.transactions = appState.transactions.filter(transaction => transaction.savingsRecordId !== recordId);
+    }
+    saveAppState();
+    renderSavingsPage();
+  }, 'rose');
+}
+
+function openEditSavingsBalanceModal() {
+  document.getElementById('directSavingsBalanceInput').value = appState.savings.totalBalance.toFixed(2);
+  document.getElementById('directSavingsBalanceNote').value = '';
+  openModal('modalEditSavingsBalance');
+}
+
+function handleDirectSavingsBalanceSubmit(e) {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('directSavingsBalanceInput').value);
+  const note = document.getElementById('directSavingsBalanceNote').value.trim();
+  if (isNaN(amount) || amount < 0 || !note) {
+    alert('Enter a valid balance and audit note.');
+    return;
+  }
+  showConfirmation('Adjust Savings Balance', `Set total church savings to ${formatUSD(amount)}?`, () => {
+    appState.savings.totalBalance = amount;
+    appState.savings.history.unshift({
+      id: `SAV-ADJ-${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+      type: 'ADJUSTMENT',
+      amount: amount,
+      custody: 'Reconciliation',
+      desc: note
+    });
+    saveAppState();
+    renderSavingsPage();
+    closeModal('modalEditSavingsBalance');
+  });
+}
+
 // -------------------------------------------------------------
-// GOALS PAGE (Requirement 10 & 19)
+// GOALS PAGE (Requirement 10 & 19 - Add, Edit, and Remove Goals)
 // -------------------------------------------------------------
 function renderGoalsPage() {
   const grid = document.getElementById('goalsListGrid');
   if (!grid) return;
   grid.innerHTML = '';
 
+  if (!appState.goals || appState.goals.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-12 text-center text-slate-400 text-sm bg-white rounded-2xl border border-slate-200">
+        <i data-lucide="target" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+        <p class="font-bold text-slate-700">No stewardship goals defined</p>
+        <p class="text-xs text-slate-400 mt-1">Click "Add Stewardship Goal" to create your first goal.</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
   appState.goals.forEach(goal => {
     const pct = goal.target > 0 ? Math.min(Math.round((goal.current / goal.target) * 100), 100) : 0;
     const card = document.createElement('div');
-    card.className = 'bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between';
+    card.className = 'bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition';
     card.innerHTML = `
       <div>
         <div class="flex items-center justify-between mb-2">
           <span class="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-bold">
             ${goal.interval} Goal
           </span>
-          <span class="text-xs font-mono font-bold text-slate-700">${pct}%</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono font-bold text-slate-700">${pct}%</span>
+            <div class="flex items-center space-x-1 pl-1.5 border-l border-slate-200">
+              <button onclick="openEditGoalModal('${goal.id}')" title="Edit Goal" class="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteGoal('${goal.id}')" title="Remove Goal" class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
         </div>
         <h3 class="font-bold text-slate-900 text-sm">${goal.title}</h3>
         
@@ -1471,6 +1865,10 @@ function renderGoalsPage() {
             <span>Amount Raised:</span>
             <span class="font-bold text-emerald-600 font-mono">${formatUSD(goal.current)}</span>
           </div>
+          <div class="flex justify-between text-slate-500">
+            <span>Amount Used:</span>
+            <span class="font-bold text-rose-600 font-mono">${formatUSD(goal.spent)}</span>
+          </div>
         </div>
 
         <div class="mt-4">
@@ -1479,40 +1877,194 @@ function renderGoalsPage() {
           </div>
         </div>
       </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+        <span class="text-[10px] font-mono text-slate-400">${goal.id}</span>
+        <div class="flex items-center space-x-2">
+          <button onclick="openEditGoalModal('${goal.id}')" class="text-[11px] font-bold text-amber-600 hover:text-amber-700 transition flex items-center space-x-1">
+            <i data-lucide="edit-2" class="w-3 h-3"></i>
+            <span>Edit</span>
+          </button>
+          <button onclick="deleteGoal('${goal.id}')" class="text-[11px] font-bold text-rose-500 hover:text-rose-700 transition flex items-center space-x-1">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+            <span>Remove</span>
+          </button>
+        </div>
+      </div>
     `;
     grid.appendChild(card);
   });
+  lucide.createIcons();
+}
+
+function openAddGoalModal() {
+  const form = document.getElementById('formGoal');
+  if (form) form.reset();
+  const editIdEl = document.getElementById('goalEditId');
+  if (editIdEl) editIdEl.value = '';
+  const headingEl = document.getElementById('modalGoalHeading');
+  if (headingEl) headingEl.innerText = 'Create Stewardship Goal';
+  const submitBtn = document.getElementById('btnGoalSubmit');
+  if (submitBtn) submitBtn.innerText = 'Save Goal';
+  const currentAmtEl = document.getElementById('goalCurrentAmount');
+  if (currentAmtEl) currentAmtEl.value = '0';
+  openModal('modalAddGoal');
+}
+
+function openEditGoalModal(goalId) {
+  const goal = appState.goals.find(g => g.id === goalId);
+  if (!goal) return;
+
+  const form = document.getElementById('formGoal');
+  if (form) form.reset();
+
+  const editIdEl = document.getElementById('goalEditId');
+  if (editIdEl) editIdEl.value = goal.id;
+
+  const headingEl = document.getElementById('modalGoalHeading');
+  if (headingEl) headingEl.innerText = 'Edit Stewardship Goal';
+
+  const titleEl = document.getElementById('goalTitle');
+  if (titleEl) titleEl.value = goal.title;
+
+  const intervalEl = document.getElementById('goalInterval');
+  if (intervalEl) intervalEl.value = goal.interval;
+
+  const targetEl = document.getElementById('goalTargetAmount');
+  if (targetEl) targetEl.value = goal.target;
+
+  const currentEl = document.getElementById('goalCurrentAmount');
+  if (currentEl) currentEl.value = goal.current || 0;
+  const spentEl = document.getElementById('goalSpentAmount');
+  if (spentEl) spentEl.value = goal.spent || 0;
+  const custodyEl = document.getElementById('goalCustody');
+  if (custodyEl) custodyEl.value = goal.custody || 'Mobile Money Wallet';
+
+  const submitBtn = document.getElementById('btnGoalSubmit');
+  if (submitBtn) submitBtn.innerText = 'Update Goal';
+
+  openModal('modalAddGoal');
+}
+
+function deleteGoal(goalId) {
+  const goal = appState.goals.find(g => g.id === goalId);
+  if (!goal) return;
+
+  showConfirmation(
+    'Delete Stewardship Goal',
+    `Are you sure you want to permanently remove the goal "${goal.title}"?`,
+    () => {
+      appState.goals = appState.goals.filter(g => g.id !== goalId);
+      appState.transactions = appState.transactions.filter(transaction => transaction.goalId !== goalId);
+      saveAppState();
+      renderGoalsPage();
+    },
+    'rose'
+  );
+}
+
+function syncGoalTransactions(goal) {
+  appState.transactions = appState.transactions.filter(transaction => transaction.goalId !== goal.id);
+  const date = new Date().toISOString().split('T')[0];
+  const base = {
+    goalId: goal.id,
+    date,
+    category: 'Stewardship Goals',
+    entity: `Stewardship Goal: ${goal.title}`,
+    custody: goal.custody,
+    recordedBy: appState.currentUser.name,
+    isGoalSync: true
+  };
+  if (goal.current > 0) {
+    appState.transactions.unshift({
+      ...base,
+      id: `TX-GOAL-INC-${goal.id}`,
+      type: 'INCOME',
+      variant: goal.title,
+      amount: goal.current,
+      description: `Stewardship goal funds raised for ${goal.title}`
+    });
+  }
+  if (goal.spent > 0) {
+    appState.transactions.unshift({
+      ...base,
+      id: `TX-GOAL-EXP-${goal.id}`,
+      type: 'EXPENSE',
+      variant: goal.title,
+      amount: goal.spent,
+      description: `Expenditure spent towards ${goal.title}`
+    });
+  }
 }
 
 function handleGoalSubmit(e) {
   e.preventDefault();
+  const editId = document.getElementById('goalEditId')?.value;
   const title = document.getElementById('goalTitle').value.trim();
   const interval = document.getElementById('goalInterval').value;
   const target = parseFloat(document.getElementById('goalTargetAmount').value);
   const current = parseFloat(document.getElementById('goalCurrentAmount').value) || 0;
+  const spent = parseFloat(document.getElementById('goalSpentAmount').value) || 0;
+  const custody = document.getElementById('goalCustody').value;
 
-  if (!title || isNaN(target) || target <= 0) {
+  if (!title || isNaN(target) || target <= 0 || isNaN(current) || current < 0 || isNaN(spent) || spent < 0) {
     alert('Please enter valid goal details.');
     return;
   }
 
-  showConfirmation(
-    'Create Financial Goal',
-    `Set stewardship goal "${title}" with target of ${formatUSD(target)}?`,
-    () => {
-      appState.goals.push({
-        id: `GOL-${Date.now()}`,
-        title,
-        interval,
-        target,
-        current
-      });
-      saveAppState();
-      renderCurrentPage();
-      closeModal('modalAddGoal');
-      e.target.reset();
+  if (editId) {
+    // Edit existing goal
+    const goalIndex = appState.goals.findIndex(g => g.id === editId);
+    if (goalIndex === -1) {
+      alert('Goal not found.');
+      return;
     }
-  );
+
+    showConfirmation(
+      'Update Stewardship Goal',
+      `Save updates to stewardship goal "${title}"?`,
+      () => {
+        appState.goals[goalIndex] = {
+          ...appState.goals[goalIndex],
+          title,
+          interval,
+          target,
+          current,
+          spent,
+          custody
+        };
+        syncGoalTransactions(appState.goals[goalIndex]);
+        saveAppState();
+        renderGoalsPage();
+        closeModal('modalAddGoal');
+        e.target.reset();
+        const editIdEl = document.getElementById('goalEditId');
+        if (editIdEl) editIdEl.value = '';
+      }
+    );
+  } else {
+    // Create new goal
+    showConfirmation(
+      'Create Financial Goal',
+      `Set stewardship goal "${title}" with target of ${formatUSD(target)}?`,
+      () => {
+        appState.goals.push({
+          id: `GOL-${Date.now()}`,
+          title,
+          interval,
+          target,
+          current,
+          spent,
+          custody
+        });
+        syncGoalTransactions(appState.goals[appState.goals.length - 1]);
+        saveAppState();
+        renderGoalsPage();
+        closeModal('modalAddGoal');
+        e.target.reset();
+      }
+    );
+  }
 }
 
 // -------------------------------------------------------------
@@ -1562,7 +2114,7 @@ function handleCreateUserSubmit(e) {
 
   const permissions = [];
   if (document.getElementById('permLogIncome').checked) permissions.push('Log Income');
-  if (document.getElementById('permLogExpense').checked) permissions.push('Disburse Expenditures');
+  if (document.getElementById('permLogExpense').checked) permissions.push('Log Expenditure');
   if (document.getElementById('permPrintReports').checked) permissions.push('Print Official Reports');
 
   if (!name || !pin) {
@@ -1628,11 +2180,11 @@ function renderPrintableReport() {
   currentTxs.forEach(t => {
     if (t.type === 'INCOME') {
       totalIncome += t.amount;
-      if (t.custody === 'Bank') bankIncome += t.amount;
+      if (t.custody === 'Mobile Money Wallet') bankIncome += t.amount;
       else cashIncome += t.amount;
     } else {
       totalExpenses += t.amount;
-      if (t.custody === 'Bank') bankExpense += t.amount;
+      if (t.custody === 'Mobile Money Wallet') bankExpense += t.amount;
       else cashExpense += t.amount;
     }
   });
@@ -1670,11 +2222,11 @@ function renderPrintableReport() {
     <!-- Executive Summary Numbers -->
     <div class="grid grid-cols-3 gap-4 pt-2">
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-        <span class="text-xs text-slate-500 uppercase font-bold block">Total Receipts</span>
+        <span class="text-xs text-slate-500 uppercase font-bold block">Total Income</span>
         <span class="text-xl font-black text-emerald-700 font-mono">${formatUSD(totalIncome)}</span>
       </div>
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-        <span class="text-xs text-slate-500 uppercase font-bold block">Total Disbursements</span>
+        <span class="text-xs text-slate-500 uppercase font-bold block">Total Expenditure</span>
         <span class="text-xl font-black text-rose-700 font-mono">${formatUSD(totalExpenses)}</span>
       </div>
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
@@ -1683,12 +2235,12 @@ function renderPrintableReport() {
       </div>
     </div>
 
-    <!-- Custody Verification (Requirement 15: Bank vs Cash on Hand) -->
+    <!-- Custody Verification (Requirement 15: Mobile Money vs Cash on Hand) -->
     <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
       <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">Custody & Physical Fund Reconciliation:</span>
       <div class="grid grid-cols-2 gap-4 text-xs font-mono">
         <div class="flex justify-between border-b pb-1">
-          <span class="text-slate-600 font-sans">Bank Account Operating Balance:</span>
+          <span class="text-slate-600 font-sans">Mobile Money Wallet Balance:</span>
           <span class="font-bold text-slate-900">${formatUSD(netBank)}</span>
         </div>
         <div class="flex justify-between border-b pb-1">
@@ -1721,7 +2273,7 @@ function renderPrintableReport() {
       </div>
 
       <div>
-        <h4 class="font-bold text-slate-800 uppercase tracking-wide mb-2">Disbursements By Category</h4>
+        <h4 class="font-bold text-slate-800 uppercase tracking-wide mb-2">Expenditure By Category</h4>
         <table class="w-full border border-slate-200 text-left">
           <thead class="bg-slate-100 font-bold border-b">
             <tr>
@@ -1735,7 +2287,7 @@ function renderPrintableReport() {
                 <td class="p-2 text-slate-700">${c}</td>
                 <td class="p-2 text-right font-mono font-semibold">${formatUSD(expCats[c])}</td>
               </tr>
-            `).join('') || '<tr><td colspan="2" class="p-2 text-slate-400">No expense records</td></tr>'}
+            `).join('') || '<tr><td colspan="2" class="p-2 text-slate-400">No expenditure records</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -1787,6 +2339,12 @@ function openModal(id) {
 function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.add('hidden');
+  if (id === 'modalAddGoal') {
+    const form = document.getElementById('formGoal');
+    if (form) form.reset();
+    const editIdEl = document.getElementById('goalEditId');
+    if (editIdEl) editIdEl.value = '';
+  }
 }
 
 function populateCategorySelect(selectId, type) {
@@ -1874,7 +2432,7 @@ function handleCreateMajorCategory() {
         variants: ['General']
       });
       if (type === 'EXPENSE' && !appState.budgets[name]) {
-        appState.budgets[name] = { monthly: 1000, quarterly: 3000, yearly: 12000 };
+        appState.budgets[name] = { monthly: 0, quarterly: 0, yearly: 0 };
       }
       saveAppState();
       renderCategoryManager();
@@ -1885,9 +2443,8 @@ function handleCreateMajorCategory() {
 
 // Utility currency formatter
 function formatUSD(amount) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2
-  }).format(amount || 0);
+  return `GH₵ ${new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number(amount) || 0)}`;
 }
