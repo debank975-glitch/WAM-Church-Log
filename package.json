@@ -1,0 +1,22 @@
+{
+  "name": "hermes-financial-log",
+  "version": "1.0.0",
+  "private": true,
+  "description": "World Ark Missions financial log server",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "smoke": "node --check server/index.js && node --check server/app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "nodemailer": "^10.0.10"
+  }
+}

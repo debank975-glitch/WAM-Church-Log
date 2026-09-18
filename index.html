@@ -60,30 +60,73 @@
 
   <!-- ================= AUTH / LOGIN OVERLAY (Locked state) ================= -->
   <div id="authOverlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 text-center animate-in fade-in">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200 animate-in fade-in">
       <div class="w-16 h-16 bg-brand-50 border border-brand-200 text-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-2xl font-black text-slate-900">World Ark Missions</h2>
-      <p class="text-xs text-slate-500 mt-1">Financial Portal & Delegated Accounting</p>
-
-      <div class="mt-6 space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Select User Account</label>
-          <select id="loginUserSelect" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-brand-500">
-            <!-- Populated dynamically with admin & delegated accounts -->
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Passcode / PIN</label>
-          <input type="password" id="loginPin" autocomplete="current-password" placeholder="Default PIN: 1234" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
-          <p class="text-[11px] text-slate-400 mt-1">Admin demo PIN: <span class="font-mono font-bold text-slate-600">1234</span></p>
-        </div>
-        <button onclick="handleLogin()" class="w-full py-3 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2">
-          <i data-lucide="unlock" class="w-4 h-4 text-accent-400"></i>
-          <span>Authenticate & Open Ledger</span>
-        </button>
+      <div class="text-center">
+        <h2 class="text-2xl font-black text-slate-900">World Ark Missions</h2>
+        <p class="text-xs text-slate-500 mt-1">Secure Financial Portal</p>
       </div>
+
+      <div class="mt-6 grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+        <button type="button" id="authAdminTab" onclick="showAuthPanel('admin')" class="py-2 rounded-lg bg-white text-slate-900 shadow-sm">Admin</button>
+        <button type="button" id="authUserTab" onclick="showAuthPanel('user')" class="py-2 rounded-lg text-slate-500">User</button>
+      </div>
+
+      <p id="authMessage" class="hidden mt-4 p-3 rounded-xl text-xs font-semibold" role="alert"></p>
+
+      <form id="adminLoginForm" class="mt-5 space-y-4 text-left" onsubmit="handleAdminLogin(event)">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Admin Username</label>
+          <input type="text" id="adminLoginUsername" autocomplete="username" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input type="password" id="adminLoginPassword" autocomplete="current-password" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+        <button type="submit" class="w-full py-3 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow-lg transition text-sm">Admin Login</button>
+        <button type="button" onclick="showAuthPanel('adminSetup')" class="w-full text-xs text-brand-700 font-bold hover:underline">First-time admin setup</button>
+      </form>
+
+      <form id="adminSetupForm" class="hidden mt-5 space-y-4 text-left" onsubmit="handleAdminSetup(event)">
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">The setup code must be supplied securely by the system operator. Only one administrator can be created.</div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <input type="text" id="adminSetupUsername" placeholder="Admin username" autocomplete="username" required class="px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+          <input type="text" id="adminSetupName" placeholder="Display name" autocomplete="name" required class="px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        </div>
+        <input type="email" id="adminSetupEmail" placeholder="Admin email" autocomplete="email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <input type="password" id="adminSetupPassword" placeholder="Strong password (12+ characters)" autocomplete="new-password" minlength="12" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <input type="password" id="adminSetupCode" placeholder="One-time admin setup code" autocomplete="off" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <button type="submit" class="w-full py-3 bg-brand-700 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg transition text-sm">Create Administrator</button>
+        <button type="button" onclick="showAuthPanel('admin')" class="w-full text-xs text-slate-500 font-bold hover:underline">Back to admin login</button>
+      </form>
+
+      <form id="userLoginForm" class="hidden mt-5 space-y-4 text-left" onsubmit="handleUserLogin(event)">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+          <input type="text" id="userLoginUsername" autocomplete="username" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input type="password" id="userLoginPassword" autocomplete="current-password" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500">
+        </div>
+        <button type="submit" class="w-full py-3 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow-lg transition text-sm">User Login</button>
+        <button type="button" onclick="showAuthPanel('userRegister')" class="w-full text-xs text-brand-700 font-bold hover:underline">Create a new user account</button>
+      </form>
+
+      <form id="userRegisterForm" class="hidden mt-5 space-y-4 text-left" onsubmit="handleUserRegister(event)">
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900">Ask the administrator for a one-time invitation code. It is sent to the email address registered for your invitation.</div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <input type="text" id="userRegisterUsername" placeholder="Username" autocomplete="username" required class="px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+          <input type="text" id="userRegisterName" placeholder="Display name" autocomplete="name" required class="px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        </div>
+        <input type="email" id="userRegisterEmail" placeholder="Invited email" autocomplete="email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <input type="password" id="userRegisterPassword" placeholder="Strong password (12+ characters)" autocomplete="new-password" minlength="12" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <input type="password" id="userRegisterCode" placeholder="One-time invitation code" autocomplete="off" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+        <button type="submit" class="w-full py-3 bg-brand-700 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg transition text-sm">Create User Account</button>
+        <button type="button" onclick="showAuthPanel('user')" class="w-full text-xs text-slate-500 font-bold hover:underline">Back to user login</button>
+      </form>
     </div>
   </div>
 
@@ -1245,7 +1288,7 @@
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Passcode PIN *</label>
-            <input type="password" id="userNewPin" placeholder="4-digit PIN" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+            <input type="email" id="userNewEmail" placeholder="User email for invitation" autocomplete="email" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
         </div>
         <div>

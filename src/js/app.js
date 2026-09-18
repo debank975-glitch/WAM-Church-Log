@@ -8,47 +8,8 @@ const SESSION_KEY = 'WORLD_ARK_MISSIONS_SESSION';
 const DEFAULT_STATE = {
   currentInterval: 'monthly', // 'monthly' | 'quarterly' | 'yearly'
   currentTitheMonthOffset: 0, // 0 = current month, -1 = previous, etc.
-  currentUser: {
-    id: 'USR-001',
-    name: 'Reverend Benjamin Eturu Adom',
-    role: 'Administrator',
-    pin: '1234',
-    isAdmin: true
-  },
-  users: [
-    {
-      id: 'USR-001',
-      name: 'Reverend Benjamin Eturu Adom',
-      role: 'Administrator',
-      pin: '1234',
-      isAdmin: true,
-      permissions: ['Log Income', 'Log Expenditure', 'Print Official Reports', 'Manage Users']
-    },
-    {
-      id: 'USR-002',
-      name: 'Elder Martha Clark',
-      role: 'Finance Secretary',
-      pin: '2345',
-      isAdmin: false,
-      permissions: ['Log Income', 'Log Expenditure', 'Print Official Reports']
-    },
-    {
-      id: 'USR-003',
-      name: 'Deacon Robert Vance',
-      role: 'Counting Trustee',
-      pin: '3456',
-      isAdmin: false,
-      permissions: ['Log Income']
-    },
-    {
-      id: 'USR-004',
-      name: 'Sarah Taylor (CPA)',
-      role: 'Internal Auditor',
-      pin: '4567',
-      isAdmin: false,
-      permissions: ['Print Official Reports']
-    }
-  ],
+  currentUser: null,
+  users: [],
   churchInfo: {
     name: 'World Ark Missions',
     address: 'Plot 12 Ark Avenue, Accra, Ghana',
@@ -424,8 +385,8 @@ function createFreshFinancialState() {
   freshState.transactions = [];
   freshState.currentInterval = 'monthly';
   freshState.currentTitheMonthOffset = 0;
-  freshState.currentUser = JSON.parse(JSON.stringify(DEFAULT_STATE.currentUser));
-  freshState.users = JSON.parse(JSON.stringify(DEFAULT_STATE.users));
+  freshState.currentUser = null;
+  freshState.users = [];
   return freshState;
 }
 
@@ -495,10 +456,8 @@ function loadAppState() {
   if (saved) {
     try {
       appState = JSON.parse(saved);
-      // Ensure users exist
-      if (!appState.users || appState.users.length === 0) {
-        appState.users = DEFAULT_STATE.users;
-      }
+      // Authentication users are server-owned; never restore credentials from browser storage.
+      appState.users = [];
       if (!appState.categories) {
         appState.categories = DEFAULT_STATE.categories;
       }
@@ -521,7 +480,7 @@ function normalizeState() {
   appState.currentInterval = appState.currentInterval || 'monthly';
   appState.budgets = appState.budgets || {};
   appState.categories = appState.categories || JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
-  appState.currentUser = appState.currentUser || JSON.parse(JSON.stringify(DEFAULT_STATE.currentUser));
+  appState.currentUser = null;
   appState.savings = appState.savings || { totalBalance: 0, history: [] };
   if (!Array.isArray(appState.savings.history)) appState.savings.history = [];
 
@@ -563,12 +522,75 @@ function saveAppState() {
 // -------------------------------------------------------------
 // AUTHENTICATION & ACCESS CONTROL (Requirement 4 & 19)
 // -------------------------------------------------------------
-function setupUserSession() {
-  updateUserUI();
-  populateLoginUserDropdown();
-  if (!sessionStorage.getItem(SESSION_KEY)) {
-    document.getElementById('authOverlay')?.classList.remove('hidden');
+async function apiRequest(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || 'Request failed');
   }
+  return payload;
+}
+
+function showAuthMessage(message, type = 'error') {
+  const element = document.getElementById('authMessage');
+  if (!element) return;
+  element.textContent = message;
+  element.className = `mt-4 p-3 rounded-xl text-xs font-semibold ${
+    type === 'success'
+      ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+      : 'bg-rose-50 border border-rose-200 text-rose-800'
+  }`;
+}
+
+function showAuthPanel(panel) {
+  const panels = {
+    admin: 'adminLoginForm',
+    adminSetup: 'adminSetupForm',
+    user: 'userLoginForm',
+    userRegister: 'userRegisterForm'
+  };
+  Object.values(panels).forEach(id => document.getElementById(id)?.classList.add('hidden'));
+  document.getElementById(panels[panel] || panels.admin)?.classList.remove('hidden');
+  document.getElementById('authAdminTab')?.classList.toggle('bg-white', panel.startsWith('admin'));
+  document.getElementById('authAdminTab')?.classList.toggle('text-slate-900', panel.startsWith('admin'));
+  document.getElementById('authAdminTab')?.classList.toggle('shadow-sm', panel.startsWith('admin'));
+  document.getElementById('authUserTab')?.classList.toggle('bg-white', panel.startsWith('user'));
+  document.getElementById('authUserTab')?.classList.toggle('text-slate-900', panel.startsWith('user'));
+  document.getElementById('authUserTab')?.classList.toggle('shadow-sm', panel.startsWith('user'));
+  document.getElementById('authMessage')?.classList.add('hidden');
+}
+
+function setAuthenticatedUser(user) {
+  appState.currentUser = {
+    id: user.id,
+    name: user.displayName || user.name || user.username,
+    username: user.username,
+    role: user.isAdmin ? 'Administrator' : (user.role || 'User'),
+    isAdmin: Boolean(user.isAdmin),
+    permissions: user.permissions || []
+  };
+  updateUserUI();
+  document.getElementById('authOverlay')?.classList.add('hidden');
+  renderCurrentPage();
+}
+
+async function setupUserSession() {
+  try {
+    const payload = await apiRequest('/api/auth/me');
+    if (payload.user) {
+      setAuthenticatedUser(payload.user);
+      return;
+    }
+  } catch (error) {
+    console.warn('Unable to restore authenticated session:', error.message);
+  }
+  document.getElementById('authOverlay')?.classList.remove('hidden');
+  showAuthPanel('admin');
+  lucide.createIcons();
 }
 
 function updateUserUI() {
@@ -584,41 +606,78 @@ function updateUserUI() {
   if (roleEl) roleEl.innerText = user.role;
 }
 
-function populateLoginUserDropdown() {
-  const select = document.getElementById('loginUserSelect');
-  if (!select) return;
-  select.innerHTML = '';
-  appState.users.forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u.id;
-    opt.innerText = `${u.name} (${u.role})`;
-    select.appendChild(opt);
-  });
+async function authenticate(path, fields, form) {
+  const submit = form.querySelector('button[type="submit"]');
+  if (submit) submit.disabled = true;
+  try {
+    const payload = await apiRequest(path, {
+      method: 'POST',
+      body: JSON.stringify(fields)
+    });
+    if (!payload.user) throw new Error('Authentication response was incomplete');
+    setAuthenticatedUser(payload.user);
+    form.reset();
+  } catch (error) {
+    showAuthMessage(error.message === 'Wrong Username or Password' ? error.message : error.message);
+  } finally {
+    if (submit) submit.disabled = false;
+  }
 }
 
-function handleLogin() {
-  const select = document.getElementById('loginUserSelect');
-  const pinInput = document.getElementById('loginPin');
-  const selectedUser = appState.users.find(u => u.id === select.value);
+function handleAdminLogin(event) {
+  event.preventDefault();
+  authenticate('/api/auth/admin/login', {
+    username: document.getElementById('adminLoginUsername').value.trim(),
+    password: document.getElementById('adminLoginPassword').value
+  }, event.currentTarget);
+}
 
-  if (!selectedUser) {
-    alert('User not found.');
-    return;
+function handleUserLogin(event) {
+  event.preventDefault();
+  authenticate('/api/auth/user/login', {
+    username: document.getElementById('userLoginUsername').value.trim(),
+    password: document.getElementById('userLoginPassword').value
+  }, event.currentTarget);
+}
+
+async function handleAdminSetup(event) {
+  event.preventDefault();
+  try {
+    const payload = await apiRequest('/api/auth/admin/setup', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: document.getElementById('adminSetupUsername').value.trim(),
+        displayName: document.getElementById('adminSetupName').value.trim(),
+        email: document.getElementById('adminSetupEmail').value.trim(),
+        password: document.getElementById('adminSetupPassword').value,
+        setupCode: document.getElementById('adminSetupCode').value
+      })
+    });
+    setAuthenticatedUser(payload.user);
+    event.currentTarget.reset();
+  } catch (error) {
+    showAuthMessage(error.message);
   }
+}
 
-  if (pinInput.value !== selectedUser.pin) {
-    alert('Incorrect PIN. For demo admin, enter 1234.');
-    return;
+async function handleUserRegister(event) {
+  event.preventDefault();
+  try {
+    const payload = await apiRequest('/api/auth/user/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: document.getElementById('userRegisterUsername').value.trim(),
+        displayName: document.getElementById('userRegisterName').value.trim(),
+        email: document.getElementById('userRegisterEmail').value.trim(),
+        password: document.getElementById('userRegisterPassword').value,
+        inviteCode: document.getElementById('userRegisterCode').value
+      })
+    });
+    setAuthenticatedUser(payload.user);
+    event.currentTarget.reset();
+  } catch (error) {
+    showAuthMessage(error.message);
   }
-
-  appState.currentUser = selectedUser;
-  sessionStorage.setItem(SESSION_KEY, 'authenticated');
-  document.getElementById('authOverlay').classList.add('hidden');
-  pinInput.value = '';
-  updateUserUI();
-  saveAppState();
-  renderCurrentPage();
-  alert(`Welcome back, ${selectedUser.name}!`);
 }
 
 function handleSignOut() {
@@ -626,9 +685,13 @@ function handleSignOut() {
     'Sign Out',
     'Are you sure you want to sign out and lock the financial ledger?',
     () => {
-      sessionStorage.removeItem(SESSION_KEY);
-      document.getElementById('authOverlay').classList.remove('hidden');
-      populateLoginUserDropdown();
+      apiRequest('/api/auth/logout', { method: 'POST' })
+        .catch(error => console.warn('Sign out request failed:', error.message))
+        .finally(() => {
+          appState.currentUser = null;
+          document.getElementById('authOverlay').classList.remove('hidden');
+          showAuthPanel('admin');
+        });
     },
     'rose'
   );
@@ -642,7 +705,7 @@ let activePage = 'home';
 
 function navigateTo(pageId) {
   // Check admin permission for editUsers
-  if (pageId === 'editUsers' && !appState.currentUser.isAdmin) {
+  if (pageId === 'editUsers' && !appState.currentUser?.isAdmin) {
     alert('Access Restricted: Only the Lead Administrator can view and edit user accounts.');
     return;
   }
@@ -2108,37 +2171,32 @@ function renderUsersTable() {
 
 function handleCreateUserSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById('userNewName').value.trim();
+  const email = document.getElementById('userNewEmail').value.trim();
   const role = document.getElementById('userNewRole').value;
-  const pin = document.getElementById('userNewPin').value.trim();
-
-  const permissions = [];
-  if (document.getElementById('permLogIncome').checked) permissions.push('Log Income');
-  if (document.getElementById('permLogExpense').checked) permissions.push('Log Expenditure');
-  if (document.getElementById('permPrintReports').checked) permissions.push('Print Official Reports');
-
-  if (!name || !pin) {
-    alert('Please enter name and PIN.');
+  if (!email) {
+    alert('Please enter the user email.');
     return;
   }
 
   showConfirmation(
-    'Create Delegated Account',
-    `Authorize ${name} as a ${role} with delegated access?`,
-    () => {
-      appState.users.push({
-        id: `USR-${Date.now()}`,
-        name,
-        role,
-        pin,
-        isAdmin: false,
-        permissions
-      });
-      saveAppState();
-      renderUsersTable();
-      populateLoginUserDropdown();
-      closeModal('modalCreateUser');
-      e.target.reset();
+    'Generate User Invitation',
+    `Generate a one-time ${role} invitation for ${email}?`,
+    async () => {
+      try {
+        const payload = await apiRequest('/api/auth/invites', {
+          method: 'POST',
+          body: JSON.stringify({ email, role })
+        });
+        closeModal('modalCreateUser');
+        e.target.reset();
+        renderUsersTable();
+        const message = payload.invite?.deliveredByEmail
+          ? 'Invitation code sent by email.'
+          : `Invitation created. Share this code securely: ${payload.invite?.code || 'check the server delivery configuration'}`;
+        alert(message);
+      } catch (error) {
+        alert(error.message);
+      }
     }
   );
 }
@@ -2151,10 +2209,7 @@ function deleteUserAccount(userId) {
     'Revoke Delegated Account',
     `Revoke access credentials for ${u.name}?`,
     () => {
-      appState.users = appState.users.filter(user => user.id !== userId);
-      saveAppState();
-      renderUsersTable();
-      populateLoginUserDropdown();
+      alert('User account revocation is managed by the server and is not available in this prototype screen yet.');
     },
     'rose'
   );

@@ -7,8 +7,7 @@ A web-based Church Financial Log and accounting portal designed for transparency
 1. **Multi-Interval Tracking**: Seamlessly switch between **Monthly**, **Quarterly**, and **Yearly** views from the top navigation bar.
 2. **Budget Quota Alert**: Live visual quota indicator and warning banner alerting you whether church spending is **Within Budget**, **Approaching Limit**, or **OVER QUOTA**.
 3. **Master Financial Balance**: Immediate tracking of **Total Income**, **Total Expenses**, and **Net Reserve Balance**.
-4. **Restricted Access & Delegated Accounts**: PIN-protected authentication. The Lead Administrator can create delegated user accounts (e.g. Finance Secretary, Counting Trustee, Auditor) with specific permissions.
-   - *Default Admin PIN*: `1234`
+4. **Restricted Access & Delegated Accounts**: Server-backed administrator and user authentication. The single administrator is bootstrapped with a one-time setup code, and user accounts are created with one-time invitation codes issued by the administrator.
 5. **Printable Report Sheet**: One-click official statement for the month, quarter, or year with church letterhead, custody reconciliation, category tables, and trustee sign-off lines.
 6. **Pie Charts**: Visual representation of income sources and expenditure departments using interactive Pie Charts.
 7. **Custom Category Management**: Add custom major income and expense categories at any time.
@@ -33,7 +32,16 @@ A web-based Church Financial Log and accounting portal designed for transparency
 
 ## How to Run
 
-Simply open [index.html](./index.html) in any modern web browser (Chrome, Microsoft Edge, Safari, Firefox). All data is saved automatically in your browser's local storage.
+Run the application through the Node server. Opening `index.html` directly bypasses the secure API and is not supported for authenticated use:
+
+```powershell
+npm install
+Copy-Item .env.example .env
+# Set ADMIN_SETUP_CODE and SESSION_SECRET in .env
+npm start
+```
+
+Then open `http://localhost:3000`. The financial prototype state remains browser-local for now; authentication credentials, invitation codes, sessions, and audit events are stored server-side.
 
 ## Project Structure
 
@@ -42,6 +50,7 @@ The prototype is organized so the current browser client can grow into a maintai
 - `index.html` - application shell and page markup
 - `src/js/app.js` - current application behavior and state transitions
 - `src/css/styles.css` - custom application styles
+- `server/` - authentication API, SQLite persistence, sessions, email delivery, and audit logging
 - `assets/` - static images and other public assets
 - `docs/ARCHITECTURE.md` - target architecture and production boundaries
 - `docs/SECURITY.md` - security improvements and prototype limitations
