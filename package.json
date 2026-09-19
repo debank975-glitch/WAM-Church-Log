@@ -10,7 +10,7 @@
     "smoke": "node --check server/index.js && node --check server/app.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
