@@ -11,4 +11,4 @@
 - Added deployment and security documentation in `docs/AUTHENTICATION.md`.
 - Upgraded Nodemailer to `10.0.10`; production dependency audit is clean.
 
-The financial ledger records remain browser-local in this increment. Moving ledger mutations and reporting to the server is required before production use.
+Ledger snapshots are now synchronized per authenticated user to the backend, with PostgreSQL/Supabase support for deployment. Field-level server validation and immutable financial transaction APIs remain recommended for a stricter production control model.

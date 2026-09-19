@@ -298,7 +298,7 @@ body.sidebar-collapsed-page .app-sidebar {
     color: #000000 !important;
   }
 
-  aside, header, #authOverlay, .no-print, button, select {
+  aside, header, .no-print, button, select {
     display: none !important;
   }
 

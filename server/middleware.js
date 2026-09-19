@@ -11,8 +11,8 @@ function rateLimit(req, res, next) {
   next();
 }
 
-function requireAuth(req, res, next) {
-  const user = userFromRequest(req);
+async function requireAuth(req, res, next) {
+  const user = await userFromRequest(req);
   if (!user) return res.status(401).json({ error: 'Authentication required' });
   req.user = user;
   next();

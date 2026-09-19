@@ -1,6 +1,6 @@
 # Application Architecture
 
-The project is currently a browser-based prototype, but its source layout now follows a production-oriented boundary:
+The project is a single-page financial client backed by an Express API. Its source layout follows a production-oriented boundary:
 
 ```text
 .
@@ -10,7 +10,7 @@ The project is currently a browser-based prototype, but its source layout now fo
 │   └── js/app.js           # Current UI and ledger behavior
 ├── server/
 │   ├── auth/               # Password hashing and session/token services
-│   ├── db/                 # SQLite connection, schema, and migrations
+│   ├── db.js               # SQLite/PostgreSQL provider and schema initialization
 │   ├── routes/              # Authentication and invitation API routes
 │   └── index.js            # HTTP server and static frontend hosting
 ├── assets/                 # Static images and other public assets
@@ -18,7 +18,7 @@ The project is currently a browser-based prototype, but its source layout now fo
 └── CHURCH_FINANCIAL_LOG_SPECS.md
 ```
 
-The existing single-page behavior is intentionally preserved while the code is moved out of the repository root. The next maintainability step should be splitting `src/js/app.js` into domain modules such as authentication, ledger, budgets, savings, goals, reporting, and UI rendering. Those modules should share typed API models once a backend is introduced.
+The existing single-page behavior is intentionally preserved while authenticated ledger snapshots are loaded from and saved to the backend. The next maintainability step should be splitting `src/js/app.js` into domain modules such as authentication, ledger, budgets, savings, goals, reporting, and UI rendering.
 
 ## Authentication flow
 
@@ -26,7 +26,7 @@ The browser uses two distinct login paths: administrator login and user login. T
 
 ## Production target
 
-For a large church, the browser should become a client of a server-side application rather than the system of record. A production deployment should use:
+The browser is now a client of a server-side application, with SQLite for local development and PostgreSQL/Supabase for deployment. A production deployment should use:
 
 - a server-side database with migrations, constraints, and backups;
 - server-enforced roles and permissions;

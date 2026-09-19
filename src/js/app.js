@@ -3,6 +3,8 @@
 
 const STORAGE_KEY = 'WORLD_ARK_MISSIONS_LEDGER_V5';
 const SESSION_KEY = 'WORLD_ARK_MISSIONS_SESSION';
+let ledgerHydrated = false;
+let ledgerSaveTimer = null;
 
 // Master Initial State with comprehensive structure
 const DEFAULT_STATE = {
@@ -516,7 +518,18 @@ function normalizeState() {
 }
 
 function saveAppState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+  const localState = JSON.stringify(appState);
+  localStorage.setItem(STORAGE_KEY, localState);
+  if (!appState.currentUser || !ledgerHydrated) return;
+
+  window.clearTimeout(ledgerSaveTimer);
+  ledgerSaveTimer = window.setTimeout(() => {
+    const serverState = { ...appState, currentUser: null, users: [] };
+    apiRequest('/api/ledger/state', {
+      method: 'PUT',
+      body: JSON.stringify({ state: serverState })
+    }).catch(error => console.warn('Unable to save ledger state to the server:', error.message));
+  }, 150);
 }
 
 // -------------------------------------------------------------
@@ -530,6 +543,9 @@ async function apiRequest(path, options = {}) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
+    if (response.status === 401 && !path.includes('/api/auth/')) {
+      window.location.replace('/auth.html?reason=session-expired');
+    }
     throw new Error(payload.error || 'Request failed');
   }
   return payload;
@@ -564,17 +580,40 @@ function showAuthPanel(panel) {
   document.getElementById('authMessage')?.classList.add('hidden');
 }
 
-function setAuthenticatedUser(user) {
+async function hydrateLedgerState() {
+  const payload = await apiRequest('/api/ledger/state');
+  if (payload.state) {
+    const authenticatedUser = appState.currentUser;
+    appState = payload.state;
+    normalizeState();
+    appState.currentUser = authenticatedUser;
+  } else {
+    ledgerHydrated = true;
+    saveAppState();
+    return;
+  }
+  ledgerHydrated = true;
+}
+
+async function setAuthenticatedUser(user) {
+  const isAdmin = user.role === 'admin' || user.role === 'Administrator' || user.isAdmin === true;
   appState.currentUser = {
     id: user.id,
     name: user.displayName || user.name || user.username,
     username: user.username,
-    role: user.isAdmin ? 'Administrator' : (user.role || 'User'),
-    isAdmin: Boolean(user.isAdmin),
-    permissions: user.permissions || []
+    role: isAdmin ? 'Administrator' : (user.role || 'User'),
+    isAdmin,
+    permissions: isAdmin
+      ? ['home', 'quota', 'tithe', 'savings', 'goals', 'charts', 'editUsers']
+      : (user.permissions || [])
   };
+  try {
+    await hydrateLedgerState();
+  } catch (error) {
+    console.warn('Unable to restore server ledger state:', error.message);
+    ledgerHydrated = true;
+  }
   updateUserUI();
-  document.getElementById('authOverlay')?.classList.add('hidden');
   renderCurrentPage();
 }
 
@@ -582,15 +621,13 @@ async function setupUserSession() {
   try {
     const payload = await apiRequest('/api/auth/me');
     if (payload.user) {
-      setAuthenticatedUser(payload.user);
+      await setAuthenticatedUser(payload.user);
       return;
     }
   } catch (error) {
     console.warn('Unable to restore authenticated session:', error.message);
   }
-  document.getElementById('authOverlay')?.classList.remove('hidden');
-  showAuthPanel('admin');
-  lucide.createIcons();
+  window.location.replace('/auth.html');
 }
 
 function updateUserUI() {
@@ -615,7 +652,7 @@ async function authenticate(path, fields, form) {
       body: JSON.stringify(fields)
     });
     if (!payload.user) throw new Error('Authentication response was incomplete');
-    setAuthenticatedUser(payload.user);
+    await setAuthenticatedUser(payload.user);
     form.reset();
   } catch (error) {
     showAuthMessage(error.message === 'Wrong Username or Password' ? error.message : error.message);
@@ -653,7 +690,7 @@ async function handleAdminSetup(event) {
         setupCode: document.getElementById('adminSetupCode').value
       })
     });
-    setAuthenticatedUser(payload.user);
+    await setAuthenticatedUser(payload.user);
     event.currentTarget.reset();
   } catch (error) {
     showAuthMessage(error.message);
@@ -673,7 +710,7 @@ async function handleUserRegister(event) {
         inviteCode: document.getElementById('userRegisterCode').value
       })
     });
-    setAuthenticatedUser(payload.user);
+    await setAuthenticatedUser(payload.user);
     event.currentTarget.reset();
   } catch (error) {
     showAuthMessage(error.message);
@@ -689,8 +726,7 @@ function handleSignOut() {
         .catch(error => console.warn('Sign out request failed:', error.message))
         .finally(() => {
           appState.currentUser = null;
-          document.getElementById('authOverlay').classList.remove('hidden');
-          showAuthPanel('admin');
+          window.location.replace('/auth.html');
         });
     },
     'rose'
@@ -704,7 +740,7 @@ function handleSignOut() {
 let activePage = 'home';
 
 function navigateTo(pageId) {
-  // Check admin permission for editUsers
+  // Edit Users is restricted to the administrator; admins have access to every page.
   if (pageId === 'editUsers' && !appState.currentUser?.isAdmin) {
     alert('Access Restricted: Only the Lead Administrator can view and edit user accounts.');
     return;
@@ -2191,7 +2227,7 @@ function handleCreateUserSubmit(e) {
         e.target.reset();
         renderUsersTable();
         const message = payload.invite?.deliveredByEmail
-          ? 'Invitation code sent by email.'
+          ? `Invitation code sent to the administrator email${payload.invite?.email ? ` (${payload.invite.email})` : ''}.`
           : `Invitation created. Share this code securely: ${payload.invite?.code || 'check the server delivery configuration'}`;
         alert(message);
       } catch (error) {
@@ -2393,10 +2429,17 @@ function openModal(id) {
 
 function closeModal(id) {
   const modal = document.getElementById(id);
-  if (modal) modal.classList.add('hidden');
+  if (!modal) return;
+  modal.querySelectorAll('form').forEach(form => form.reset());
+  modal.querySelectorAll('input[type="hidden"]').forEach(input => {
+    input.value = '';
+  });
+  modal.classList.add('hidden');
+  if (id === 'modalTitheDay') {
+    pendingTitheEntries = [];
+    renderPendingTitheEntries();
+  }
   if (id === 'modalAddGoal') {
-    const form = document.getElementById('formGoal');
-    if (form) form.reset();
     const editIdEl = document.getElementById('goalEditId');
     if (editIdEl) editIdEl.value = '';
   }
