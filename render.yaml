@@ -3,7 +3,7 @@ services:
     name: hermes-financial-log
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install --omit=optional
     startCommand: npm start
     healthCheckPath: /auth.html
     autoDeploy: true

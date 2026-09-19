@@ -1,7 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Pool } = require('pg');
-const SqliteDatabase = require('better-sqlite3');
 const config = require('./config');
 
 const provider = String(config.databaseProvider || 'sqlite').toLowerCase();
@@ -43,6 +42,12 @@ class PostgresStatement {
 }
 
 function sqliteDb() {
+  let SqliteDatabase;
+  try {
+    SqliteDatabase = require('better-sqlite3');
+  } catch (error) {
+    throw new Error('SQLite support requires the better-sqlite3 package. Install optional dependencies or use DATABASE_PROVIDER=postgres.', { cause: error });
+  }
   fs.mkdirSync(path.dirname(config.databasePath), { recursive: true });
   const db = new SqliteDatabase(config.databasePath);
   db.pragma('journal_mode = WAL');
