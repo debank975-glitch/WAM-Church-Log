@@ -21,7 +21,7 @@
     "nodemailer": "^10.0.10",
     "pg": "^8.23.0"
   },
-  "optionalDependencies": {
+  "devDependencies": {
     "better-sqlite3": "^11.7.0"
   }
 }
