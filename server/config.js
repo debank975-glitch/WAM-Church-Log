@@ -25,7 +25,7 @@ const config = {
     clientSecret: process.env.GMAIL_CLIENT_SECRET,
     refreshToken: process.env.GMAIL_REFRESH_TOKEN,
     sender: process.env.GMAIL_SENDER || process.env.ADMIN_EMAIL,
-    redirectUri: process.env.GMAIL_REDIRECT_URI || '',
+    redirectUri: process.env.GMAIL_REDIRECT_URI || 'https://hermes-financial-log.onrender.com/oauth2callback',
     oauthSetupKey: process.env.GMAIL_OAUTH_SETUP_KEY || ''
   }
 };
