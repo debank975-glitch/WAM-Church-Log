@@ -7,13 +7,13 @@ const router = express.Router();
 const pendingStates = new Map();
 const scope = 'https://www.googleapis.com/auth/gmail.send';
 
-function isConfigured() {
-  return Boolean(
-    config.gmail.clientId &&
-    config.gmail.clientSecret &&
-    config.gmail.redirectUri &&
-    config.gmail.oauthSetupKey
-  );
+function missingConfiguration() {
+  return [
+    ['GMAIL_CLIENT_ID', config.gmail.clientId],
+    ['GMAIL_CLIENT_SECRET', config.gmail.clientSecret],
+    ['GMAIL_REDIRECT_URI', config.gmail.redirectUri],
+    ['GMAIL_OAUTH_SETUP_KEY', config.gmail.oauthSetupKey]
+  ].filter(([, value]) => !String(value || '').trim()).map(([name]) => name);
 }
 
 function client() {
@@ -32,7 +32,13 @@ function page(title, body) {
 }
 
 router.get('/oauth2authorize', (req, res) => {
-  if (!isConfigured()) return res.status(503).send(page('OAuth is not configured', '<p>Add the Gmail OAuth variables first.</p>'));
+  const missing = missingConfiguration();
+  if (missing.length) {
+    return res.status(503).send(page(
+      'OAuth is not configured',
+      `<p>Add these missing Render environment variables:</p><p><code>${missing.join('</code>, <code>')}</code></p>`
+    ));
+  }
   if (req.query.key !== config.gmail.oauthSetupKey) return res.status(404).send('Not found');
 
   const state = crypto.randomBytes(32).toString('hex');
