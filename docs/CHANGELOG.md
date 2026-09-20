@@ -5,7 +5,7 @@
 - Replaced browser-only PIN authentication with a Node.js/Express authentication API.
 - Added SQLite persistence for users, hashed passwords, sessions, invitation codes, and audit events.
 - Added one-time administrator setup protected by `ADMIN_SETUP_CODE`.
-- Added administrator-generated, expiring, single-use user invitation codes with optional SMTP delivery.
+- Added administrator-generated, expiring, single-use user invitation codes with Gmail API OAuth delivery.
 - Added separate administrator and user login/registration panels to the frontend.
 - Standardized invalid login responses to `Wrong Username or Password`.
 - Added deployment and security documentation in `docs/AUTHENTICATION.md`.

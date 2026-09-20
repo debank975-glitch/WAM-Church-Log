@@ -58,7 +58,7 @@ Existing local SQLite data is not automatically migrated to PostgreSQL. Export o
 2. Create a free Render Web Service from this repository. Render can use the included `render.yaml`.
 3. Set `DATABASE_URL` to the Supabase connection string and keep `DATABASE_PROVIDER=postgres`.
 4. Add strong random values for `SESSION_SECRET` and `ADMIN_SETUP_CODE`.
-5. Add the SMTP variables if invitation email delivery is required.
+5. Add the Gmail API OAuth variables if invitation email delivery is required.
 6. Deploy and open the Render-provided `https://*.onrender.com/auth.html` URL.
 
 The free Render service may sleep when idle, and Supabase free projects have usage and inactivity limits. Keep regular database backups before using the site for official financial records.

@@ -2217,7 +2217,7 @@ function handleCreateUserSubmit(e) {
   async function sendTestEmail() {
     try {
       const payload = await apiRequest('/api/auth/admin/test-email', { method: 'POST' });
-      alert(`Test email sent to ${payload.email}. Check the inbox and spam folder.`);
+      alert(`Test email sent to ${payload.email} through Gmail API. Check the inbox and spam folder.`);
     } catch (error) {
       alert(error.message);
     }

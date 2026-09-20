@@ -22,7 +22,7 @@ The existing single-page behavior is intentionally preserved while authenticated
 
 ## Authentication flow
 
-The browser uses two distinct login paths: administrator login and user login. The first administrator must provide `ADMIN_SETUP_CODE`; the API enforces that only one administrator can ever be created. After login, the server issues a random session token stored in an HTTP-only cookie. The administrator can generate a one-time, expiring invitation code for a user; invitation codes and passwords are stored only as salted, slow hashes. SMTP settings are optional in development, but production deployments should configure them so invitation codes are delivered by email instead of returned by the API.
+The browser uses two distinct login paths: administrator login and user login. The first administrator must provide `ADMIN_SETUP_CODE`; the API enforces that only one administrator can ever be created. After login, the server issues a random session token stored in an HTTP-only cookie. The administrator can generate a one-time, expiring invitation code for a user; invitation codes and passwords are stored only as salted, slow hashes. Production deployments should configure Gmail API OAuth so invitation codes are delivered by email instead of returned by the API.
 
 ## Production target
 

@@ -20,14 +20,13 @@ const config = {
   sessionTtlDays: Number(process.env.SESSION_TTL_DAYS || 7),
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 900000),
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 20),
-  smtp: {
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === 'true',
-    user: process.env.SMTP_USER,
-    password: process.env.SMTP_PASSWORD,
-    from: process.env.SMTP_FROM,
-    adminEmail: process.env.ADMIN_EMAIL
+  gmail: {
+    clientId: process.env.GMAIL_CLIENT_ID,
+    clientSecret: process.env.GMAIL_CLIENT_SECRET,
+    refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+    sender: process.env.GMAIL_SENDER || process.env.ADMIN_EMAIL,
+    redirectUri: process.env.GMAIL_REDIRECT_URI || '',
+    oauthSetupKey: process.env.GMAIL_OAUTH_SETUP_KEY || ''
   }
 };
 

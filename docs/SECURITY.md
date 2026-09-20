@@ -13,4 +13,4 @@
 
 Authenticated ledger state is now stored per user on the configured backend and synchronized from the browser. Browser storage remains only as a local fallback/cache. The current API accepts a complete ledger snapshot from an authenticated session; production financial controls should still add server-side field-level validation, immutable transaction records, approval workflows, and authorization checks for each mutation.
 
-Set a strong random `SESSION_SECRET`, a private `ADMIN_SETUP_CODE`, and SMTP credentials in the deployment environment. Never commit `.env` or expose setup/invitation codes in production API responses. Passwords must be at least 12 characters, and rate limiting should remain enabled on all authentication endpoints.
+Set a strong random `SESSION_SECRET`, a private `ADMIN_SETUP_CODE`, and Gmail API OAuth credentials in the deployment environment. Never commit `.env` or expose setup/invitation codes in production API responses. Passwords must be at least 12 characters, and rate limiting should remain enabled on all authentication endpoints.

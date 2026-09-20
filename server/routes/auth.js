@@ -82,7 +82,7 @@ async function createInvite(req, res) {
   await db.prepare('INSERT INTO invite_codes (code_hash,created_by,expires_at) VALUES (?,?,?)').run(hash(code), req.user.id, expiresAt);
   await audit('invite_created', req, req.user);
   const invitedEmail = req.body.email ? String(req.body.email).trim() : null;
-  const adminEmail = config.smtp.adminEmail || req.user.email;
+  const adminEmail = config.gmail.sender || req.user.email;
   try {
     const emailed = await sendInvite(code, adminEmail, invitedEmail, expiresAt);
     const invite = { deliveredByEmail: emailed, email: adminEmail, invitedEmail, expiresAt };
@@ -101,20 +101,20 @@ async function createInvite(req, res) {
 router.post(['/admin/invites', '/invites'], requireAuth, requireAdmin, createInvite);
 
 router.post('/admin/test-email', requireAuth, requireAdmin, async (req, res) => {
-  const recipient = config.smtp.adminEmail || req.user.email;
+  const recipient = config.gmail.sender || req.user.email;
   if (!recipient) return res.status(400).json({ error: 'No administrator email is configured' });
   try {
-    const sent = await sendInvite('SMTP-TEST-DO-NOT-USE', recipient, 'SMTP delivery test', new Date().toISOString());
-    if (!sent) return res.status(503).json({ error: 'SMTP is not fully configured' });
+    const sent = await sendInvite('GMAIL-API-TEST-DO-NOT-USE', recipient, 'Gmail API delivery test', new Date().toISOString());
+    if (!sent) return res.status(503).json({ error: 'Gmail API is not fully configured' });
     res.json({ sent: true, email: recipient });
   } catch (error) {
-    console.error('SMTP test delivery failed:', {
+    console.error('Gmail API test delivery failed:', {
       code: error.code,
       command: error.command,
       responseCode: error.responseCode,
       message: error.message
     });
-    res.status(503).json({ error: 'SMTP test delivery failed' });
+    res.status(503).json({ error: 'Gmail API test delivery failed' });
   }
 });
 

@@ -30,17 +30,17 @@ services:
         value: "900000"
       - key: RATE_LIMIT_MAX
         value: "20"
-      - key: SMTP_HOST
+      - key: GMAIL_CLIENT_ID
         sync: false
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_SECURE
-        value: "false"
-      - key: SMTP_USER
+      - key: GMAIL_CLIENT_SECRET
         sync: false
-      - key: SMTP_PASSWORD
+      - key: GMAIL_REFRESH_TOKEN
         sync: false
-      - key: SMTP_FROM
+      - key: GMAIL_SENDER
+        sync: false
+      - key: GMAIL_REDIRECT_URI
+        value: https://hermes-financial-log.onrender.com/oauth2callback
+      - key: GMAIL_OAUTH_SETUP_KEY
         sync: false
       - key: ADMIN_EMAIL
         sync: false
