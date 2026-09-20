@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('node:path');
 const cookieParser = require('cookie-parser');
 const config = require('./config');
+const { userFromRequest } = require('./auth');
 const authRoutes = require('./routes/auth');
 const ledgerRoutes = require('./routes/ledger');
 const gmailOauthRoutes = require('./routes/gmail-oauth');
@@ -14,6 +15,14 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/ledger', ledgerRoutes);
 app.use('/', gmailOauthRoutes);
+app.get(['/', '/index.html'], async (req, res, next) => {
+  try {
+    if (!(await userFromRequest(req))) return res.redirect('/auth.html');
+    return res.sendFile(path.join(config.root, 'index.html'));
+  } catch (error) {
+    return next(error);
+  }
+});
 app.use(express.static(config.root));
 app.get('*', (req, res, next) => req.path.startsWith('/api/') ? next() : res.sendFile(path.join(config.root, 'index.html')));
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));

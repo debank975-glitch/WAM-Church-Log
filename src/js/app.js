@@ -543,7 +543,8 @@ async function apiRequest(path, options = {}) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    if (response.status === 401 && !path.includes('/api/auth/')) {
+    const publicAuthRoute = ['/api/auth/admin/login', '/api/auth/admin/setup', '/api/auth/user/login', '/api/auth/user/register'].includes(path);
+    if (response.status === 401 && !publicAuthRoute) {
       window.location.replace('/auth.html?reason=session-expired');
     }
     throw new Error(payload.error || 'Request failed');
@@ -2214,15 +2215,6 @@ function handleCreateUserSubmit(e) {
     return;
   }
 
-  async function sendTestEmail() {
-    try {
-      const payload = await apiRequest('/api/auth/admin/test-email', { method: 'POST' });
-      alert(`Test email sent to ${payload.email} through Gmail API. Check the inbox and spam folder.`);
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
   showConfirmation(
     'Generate User Invitation',
     `Generate a one-time ${role} invitation for ${email}?`,
@@ -2242,8 +2234,18 @@ function handleCreateUserSubmit(e) {
       } catch (error) {
         alert(error.message);
       }
+
     }
   );
+}
+
+async function sendTestEmail() {
+  try {
+    const payload = await apiRequest('/api/auth/admin/test-email', { method: 'POST' });
+    alert(`Test email sent to ${payload.email} through Gmail API. Check the inbox and spam folder.`);
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
 function deleteUserAccount(userId) {
