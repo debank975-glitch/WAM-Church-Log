@@ -2214,6 +2214,15 @@ function handleCreateUserSubmit(e) {
     return;
   }
 
+  async function sendTestEmail() {
+    try {
+      const payload = await apiRequest('/api/auth/admin/test-email', { method: 'POST' });
+      alert(`Test email sent to ${payload.email}. Check the inbox and spam folder.`);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
   showConfirmation(
     'Generate User Invitation',
     `Generate a one-time ${role} invitation for ${email}?`,
