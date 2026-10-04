@@ -48,10 +48,9 @@
       <form id="adminLoginForm" class="auth-form" novalidate>
               <label>Admin username<input id="adminLoginUsername" type="text" autocomplete="username" required></label>
               <div class="password-wrapper">
-                <label>Password<input id="adminLoginPassword" type="password" autocomplete="current-password" required></label>
-                <button type="button" class="password-toggle" data-target="adminLoginPassword" aria-label="Show password">
+                <label>Password<div class="password-input-wrap"><input id="adminLoginPassword" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-target="adminLoginPassword" aria-label="Show password">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <button class="primary-button" type="submit">Sign in as administrator <span>→</span></button>
               <button class="text-button" type="button" data-panel="adminSetup">First-time administrator setup</button>
@@ -62,16 +61,14 @@
               <div class="form-grid"><label>Username<input id="adminSetupUsername" type="text" autocomplete="username" required></label><label>Display name<input id="adminSetupName" type="text" autocomplete="name" required></label></div>
               <label>Email<input id="adminSetupEmail" type="email" autocomplete="email" required></label>
               <div class="password-wrapper">
-                <label>Password<input id="adminSetupPassword" type="password" minlength="12" autocomplete="new-password" required></label>
-                <button type="button" class="password-toggle" data-target="adminSetupPassword" aria-label="Show password">
+                <label>Password<div class="password-input-wrap"><input id="adminSetupPassword" type="password" minlength="12" autocomplete="new-password" required><button type="button" class="password-toggle" data-target="adminSetupPassword" aria-label="Show password">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <div class="password-wrapper">
-                <label>One-time setup code<input id="adminSetupCode" type="password" autocomplete="off" required></label>
-                <button type="button" class="password-toggle" data-target="adminSetupCode" aria-label="Show setup code">
+                <label>One-time setup code<div class="password-input-wrap"><input id="adminSetupCode" type="password" autocomplete="off" required><button type="button" class="password-toggle" data-target="adminSetupCode" aria-label="Show setup code">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <button class="primary-button" type="submit">Create administrator <span>→</span></button>
               <button class="text-button" type="button" data-panel="admin">Back to administrator sign in</button>
@@ -80,10 +77,9 @@
       <form id="userLoginForm" class="auth-form hidden" novalidate>
               <label>Username<input id="userLoginUsername" type="text" autocomplete="username" required></label>
               <div class="password-wrapper">
-                <label>Password<input id="userLoginPassword" type="password" autocomplete="current-password" required></label>
-                <button type="button" class="password-toggle" data-target="userLoginPassword" aria-label="Show password">
+                <label>Password<div class="password-input-wrap"><input id="userLoginPassword" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-target="userLoginPassword" aria-label="Show password">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <button class="primary-button" type="submit">Sign in to the ledger <span>→</span></button>
             </form>
@@ -91,16 +87,14 @@
       <form id="passwordChangeForm" class="auth-form hidden" novalidate>
               <div class="notice blue">Your administrator created this account with a temporary password. Set a new password before entering the ledger.</div>
               <div class="password-wrapper">
-                <label>New password<input id="newPassword" type="password" minlength="12" autocomplete="new-password" required></label>
-                <button type="button" class="password-toggle" data-target="newPassword" aria-label="Show new password">
+                <label>New password<div class="password-input-wrap"><input id="newPassword" type="password" minlength="12" autocomplete="new-password" required><button type="button" class="password-toggle" data-target="newPassword" aria-label="Show new password">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <div class="password-wrapper">
-                <label>Confirm new password<input id="confirmNewPassword" type="password" minlength="12" autocomplete="new-password" required></label>
-                <button type="button" class="password-toggle" data-target="confirmNewPassword" aria-label="Show confirmed password">
+                <label>Confirm new password<div class="password-input-wrap"><input id="confirmNewPassword" type="password" minlength="12" autocomplete="new-password" required><button type="button" class="password-toggle" data-target="confirmNewPassword" aria-label="Show confirmed password">
                   <svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                </button>
+                </button></div></label>
               </div>
               <button class="primary-button" type="submit">Set new password <span>→</span></button>
             </form>
