@@ -15,7 +15,7 @@ A web-based Church Financial Log and accounting portal designed for transparency
 9. **Delete Records with Confirmation**: Void and delete ledger entries with instant confirmation and balance re-calculation.
 10. **Time-Based Budgets**: Set spending allocations for Monthly, Quarterly, and Yearly goals per department.
 11. **Savings Tracking**: Dedicated Savings page tracking designated reserve accounts (Building Fund, Emergency Welfare, Youth Endowment) and progress towards financial goals.
-12. **Category Variants (Sub-categories)**: Split major categories into clearly visible variants (e.g., `Utilities` &rarr; `Water`, `Electricity`, `Wifi & Internet`, `Generator Fuel & Gas`).
+12. **User-defined Categories**: Administrators and authorized users create the major categories and subcategories they need; the application does not impose a preset hierarchy.
 13. **Dedicated Tithe Page**: Separate section for tithes, indicating whether giving was in physical cash or electronic money.
 14. & 15. **Mobile Money Wallet vs. Cash on Hand**: Custody tracking showing the exact amount held in the Mobile Money Wallet vs. physical cash held in the church safe/vault.
 16. **Detailed Descriptions**: Required description field on income and expenditure entries (does not apply to the tithe page).

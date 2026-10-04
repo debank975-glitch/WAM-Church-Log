@@ -345,7 +345,7 @@
               <p class="text-xs text-slate-500">Audit of all income and expenditure entries</p>
             </div>
             <div class="flex items-center space-x-2">
-              <input type="text" id="ledgerSearch" oninput="renderLedgerTable()" placeholder="Search description, payee, or ID..." class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
+              <input type="text" id="ledgerSearch" oninput="renderLedgerTable()" placeholder="Search description, donor/entity, or ID..." class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
               <select id="ledgerFilterType" onchange="renderLedgerTable()" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs bg-white">
                 <option value="ALL">All Entries</option>
                 <option value="INCOME">Income Only</option>
@@ -361,7 +361,7 @@
                   <th class="py-3 px-4">Date</th>
                   <th class="py-3 px-4">Type</th>
                   <th class="py-3 px-4">Category & Variant</th>
-                  <th class="py-3 px-4">Entity / Payee</th>
+                  <th class="py-3 px-4">Donor / Entity</th>
                   <th class="py-3 px-4">Description</th>
                   <th class="py-3 px-4">Custody</th>
                   <th class="py-3 px-4 text-right">Amount</th>
@@ -407,7 +407,7 @@
 
         <!-- Budget Cards Grid showing Major Category and Variants (Requirement 12) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="budgetHierarchyGrid">
-          <!-- Dynamically populated with category cards & variants like Utilities: Water, Electricity, Wifi -->
+          <!-- Dynamically populated with user-created categories and subcategories -->
         </div>
 
       </div>
@@ -659,11 +659,11 @@
       <form id="formIncome" onsubmit="handleIncomeFormSubmit(event)" class="p-6 space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Date *</label>
+            <label class="block font-bold text-slate-700 mb-1">Date</label>
             <input type="date" id="incDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Custody / Destination *</label>
+            <label class="block font-bold text-slate-700 mb-1">Custody / Destination</label>
             <select id="incCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
               <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
               <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
@@ -673,33 +673,29 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Major Category *</label>
-            <select id="incCategory" onchange="populateSubcategories('incCategory', 'incVariant')" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <!-- Dynamically populated from category list -->
-            </select>
+            <label class="block font-bold text-slate-700 mb-1">Major Category</label>
+            <input type="text" id="incCategory" placeholder="Add an income category" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Subcategory Variant *</label>
-            <select id="incVariant" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <!-- Dynamically populated -->
-            </select>
+            <label class="block font-bold text-slate-700 mb-1">Subcategory</label>
+            <input type="text" id="incVariant" placeholder="Add a subcategory" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Donor / Entity *</label>
+            <label class="block font-bold text-slate-700 mb-1">Donor / Entity</label>
             <input type="text" id="incDonor" placeholder="e.g. Sunday Collection Basket" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵)</label>
             <input type="number" step="0.01" min="0.01" id="incAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 font-mono">
           </div>
         </div>
 
         <!-- Description Option for Details (Requirement 16) -->
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Description / Details *</label>
+          <label class="block font-bold text-slate-700 mb-1">Description / Details</label>
           <textarea id="incDesc" rows="2" placeholder="Provide detailed explanation regarding this income entry..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"></textarea>
         </div>
 
@@ -727,11 +723,11 @@
       <form id="formExpense" onsubmit="handleExpenseFormSubmit(event)" class="p-6 space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Date *</label>
+            <label class="block font-bold text-slate-700 mb-1">Date</label>
             <input type="date" id="expDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Paid From (Custody) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Paid From (Custody)</label>
             <select id="expCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
               <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
               <option value="Cash on Hand">Cash on Hand (Petty Cash)</option>
@@ -741,33 +737,29 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Major Category *</label>
-            <select id="expCategory" onchange="populateSubcategories('expCategory', 'expVariant')" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <!-- Dynamically populated -->
-            </select>
+            <label class="block font-bold text-slate-700 mb-1">Major Category</label>
+            <input type="text" id="expCategory" placeholder="Add an expenditure category" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Subcategory Variant *</label>
-            <select id="expVariant" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-              <!-- Dynamically populated, e.g. Utility -> Water, Electricity, Wifi -->
-            </select>
+            <label class="block font-bold text-slate-700 mb-1">Subcategory</label>
+            <input type="text" id="expVariant" placeholder="Add a subcategory" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Payee / Vendor *</label>
+            <label class="block font-bold text-slate-700 mb-1">Donor / Entity</label>
             <input type="text" id="expPayee" placeholder="e.g. City Water Dept" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵)</label>
             <input type="number" step="0.01" min="0.01" id="expAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 font-mono">
           </div>
         </div>
 
         <!-- Description Option for Details (Requirement 16) -->
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Description / Details *</label>
+          <label class="block font-bold text-slate-700 mb-1">Description / Details</label>
           <textarea id="expDesc" rows="2" placeholder="Provide detailed explanation regarding this expenditure entry..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"></textarea>
         </div>
 
@@ -824,12 +816,23 @@
           </span>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Donor / Member Name *</label>
+            <label class="block font-bold text-slate-700 mb-1">Donor / Entity Name</label>
             <input type="text" id="titheDonorName" placeholder="e.g. Deacon Robert Vance" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
 
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Major Category</label>
+              <input type="text" id="titheCategory" placeholder="Add an income category" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Subcategory</label>
+              <input type="text" id="titheSubcategory" placeholder="Add a subcategory" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
+            </div>
+          </div>
+
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Tithe Amount (GH₵) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Tithe Amount (GH₵)</label>
             <input type="number" step="0.01" min="0.01" id="titheAmount" placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold font-mono">
           </div>
 
@@ -846,7 +849,7 @@
               </label>
             </div>
             <p class="text-[10px] text-slate-400">
-              * If E-Cash is unchecked, it will be logged as Physical Money (Cash on Hand).
+              If E-Cash is unchecked, it will be logged as Physical Money (Cash on Hand).
             </p>
           </div>
 
@@ -877,7 +880,7 @@
       <div class="p-6 space-y-4 text-xs max-h-[75vh] overflow-y-auto">
         <!-- Add new subcategory variant -->
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-          <span class="font-bold text-slate-800 block">Add Variant under Category (e.g. Utility &rarr; Wifi)</span>
+          <span class="font-bold text-slate-800 block">Add a subcategory under a major category</span>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-slate-500 font-semibold mb-1">Select Major Category</label>
@@ -887,7 +890,7 @@
             </div>
             <div>
               <label class="block text-slate-500 font-semibold mb-1">New Variant Name</label>
-              <input type="text" id="catManagerVariantName" placeholder="e.g. Wifi, Generator Fuel" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl">
+              <input type="text" id="catManagerVariantName" placeholder="Enter a subcategory" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl">
             </div>
           </div>
           <button onclick="handleAddCategoryVariant()" class="w-full py-2 bg-church-900 hover:bg-church-800 text-white font-bold rounded-xl shadow transition">
@@ -908,7 +911,7 @@
             </div>
             <div>
               <label class="block text-slate-500 font-semibold mb-1">Major Category Name</label>
-              <input type="text" id="catManagerNewName" placeholder="e.g. Evangelism Outreach" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl">
+              <input type="text" id="catManagerNewName" placeholder="Enter a major category" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl">
             </div>
           </div>
           <button onclick="handleCreateMajorCategory()" class="w-full py-2 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow transition">
@@ -937,10 +940,8 @@
 
       <form id="formBudget" onsubmit="handleBudgetSubmit(event)" class="p-6 space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Target Category *</label>
-          <select id="budgetCategorySelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
-            <!-- Dynamically populated -->
-          </select>
+          <label class="block font-bold text-slate-700 mb-1">Target Category</label>
+          <input type="text" id="budgetCategorySelect" required placeholder="Add an expenditure category" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
         </div>
 
         <div class="grid grid-cols-3 gap-2">
@@ -981,11 +982,11 @@
 
       <form id="formSavingsDeposit" onsubmit="handleSavingsDepositSubmit(event)" class="p-6 space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Deposit Amount (GH₵) *</label>
+          <label class="block font-bold text-slate-700 mb-1">Deposit Amount (GH₵)</label>
           <input type="number" step="0.01" min="0.01" id="savingsDepositAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Source Custody Channel *</label>
+          <label class="block font-bold text-slate-700 mb-1">Source Custody Channel</label>
           <select id="savingsDepositCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
             <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
             <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
@@ -1029,18 +1030,18 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Withdrawal Amount (GH₵) *</label>
+          <label class="block font-bold text-slate-700 mb-1">Withdrawal Amount (GH₵)</label>
           <input type="number" step="0.01" min="0.01" id="savingsWithdrawAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Added To Custody Channel *</label>
+          <label class="block font-bold text-slate-700 mb-1">Added To Custody Channel</label>
           <select id="savingsWithdrawCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
             <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
             <option value="Cash on Hand">Cash on Hand (Vault / Safe)</option>
           </select>
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Reason / Purpose for Withdrawal *</label>
+          <label class="block font-bold text-slate-700 mb-1">Reason / Purpose for Withdrawal</label>
           <input type="text" id="savingsWithdrawDesc" placeholder="e.g. Transfer savings to operating income" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="pt-2 flex justify-end space-x-2">
@@ -1065,11 +1066,11 @@
         <input type="hidden" id="editSavingsRecId" value="">
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Date *</label>
+            <label class="block font-bold text-slate-700 mb-1">Date</label>
             <input type="date" id="editSavingsRecDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Transaction Type *</label>
+            <label class="block font-bold text-slate-700 mb-1">Transaction Type</label>
             <select id="editSavingsRecType" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
               <option value="DEPOSIT">Deposit (+)</option>
               <option value="WITHDRAWAL">Withdrawal (-)</option>
@@ -1078,11 +1079,11 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Amount (GH₵)</label>
             <input type="number" step="0.01" min="0.01" id="editSavingsRecAmount" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Custody Channel *</label>
+            <label class="block font-bold text-slate-700 mb-1">Custody Channel</label>
             <select id="editSavingsRecCustody" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
               <option value="Mobile Money Wallet">Mobile Money Wallet</option>
               <option value="Cash on Hand">Cash on Hand</option>
@@ -1113,11 +1114,11 @@
 
       <form id="formEditSavingsBalance" onsubmit="handleDirectSavingsBalanceSubmit(event)" class="p-6 space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">New Total Church Savings Amount (GH₵) *</label>
+          <label class="block font-bold text-slate-700 mb-1">New Total Church Savings Amount (GH₵)</label>
           <input type="number" step="0.01" min="0" id="directSavingsBalanceInput" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-base">
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Audit Note / Reason *</label>
+          <label class="block font-bold text-slate-700 mb-1">Audit Note / Reason</label>
           <input type="text" id="directSavingsBalanceNote" placeholder="e.g. Reconciled with savings account statement" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="pt-2 flex justify-end space-x-2">
@@ -1144,12 +1145,12 @@
       <form id="formGoal" onsubmit="handleGoalSubmit(event)" class="p-6 space-y-4 text-xs">
         <input type="hidden" id="goalEditId" value="">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Goal Title *</label>
+          <label class="block font-bold text-slate-700 mb-1">Goal Title</label>
           <input type="text" id="goalTitle" placeholder="e.g. New Sanctuary Sound Console" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Target Interval *</label>
+            <label class="block font-bold text-slate-700 mb-1">Target Interval</label>
             <select id="goalInterval" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
               <option value="Monthly">Monthly</option>
               <option value="Quarterly">Quarterly</option>
@@ -1157,7 +1158,7 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Target Goal Amount (GH₵) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Target Goal Amount (GH₵)</label>
             <input type="number" step="10" min="1" id="goalTargetAmount" placeholder="5000" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold">
           </div>
         </div>
@@ -1176,7 +1177,7 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Custody Channel *</label>
+          <label class="block font-bold text-slate-700 mb-1">Custody Channel</label>
           <select id="goalCustody" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
             <option value="Mobile Money Wallet">Mobile Money Wallet (MoMo)</option>
             <option value="Cash on Hand">Cash on Hand</option>

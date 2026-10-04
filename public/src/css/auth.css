@@ -3,8 +3,11 @@
   --ink: #263746;
   --muted: #70808a;
   --line: rgba(23, 50, 77, .14);
-  --green: #2f6b58;
-  --green-dark: #17324d;
+  --green: #7a2948;
+  --green-dark: #541a32;
+  --wine: #7a2948;
+  --wine-deep: #541a32;
+  --wine-soft: #f7e9ee;
   --cream: #f8f7f2;
   --gold: #c7983e;
   --ease: cubic-bezier(.22, 1, .36, 1);
@@ -16,10 +19,10 @@ body {
   min-height: 100vh;
   color: var(--ink);
   font-family: 'Open Sans', sans-serif;
-  background: radial-gradient(circle at 10% 8%, rgba(199, 152, 62, .16), transparent 24%), linear-gradient(135deg, #f8f7f2, #e7eee9);
+  background: radial-gradient(circle at 10% 8%, rgba(122, 41, 72, .16), transparent 24%), linear-gradient(135deg, #fbf6f7, #f1e5ea);
 }
 .auth-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, .95fr) minmax(420px, 1.05fr); }
-.auth-brand { padding: clamp(3rem, 9vw, 8rem); display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, #17324d 0%, #123b3a 72%, #102536 100%); color: #fff; }
+.auth-brand { padding: clamp(3rem, 9vw, 8rem); display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, #541a32 0%, #7a2948 72%, #3f1427 100%); color: #fff; }
 .brand-mark, .lock-mark { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 1.15rem; background: var(--gold); color: var(--green-dark); font-weight: 800; font-size: .8rem; letter-spacing: .08em; }
 .brand-mark img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
 .eyebrow { margin: 0 0 .8rem; font-size: .68rem; letter-spacing: .16em; font-weight: 800; }
@@ -31,7 +34,7 @@ body {
 .card-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
 .card-heading h2 { margin: 0; font-family: 'Merriweather', Georgia, serif; font-size: 2rem; letter-spacing: -.05em; }
 .muted { margin: .45rem 0 0; color: var(--muted); font-size: .85rem; }
-.lock-mark { width: 2.8rem; height: 2.8rem; border-radius: .9rem; background: #e8f4ed; color: var(--green); }
+.lock-mark { width: 2.8rem; height: 2.8rem; border-radius: .9rem; background: var(--wine-soft); color: var(--wine); }
 .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; padding: .3rem; margin: 2rem 0 1.3rem; background: #eef3f1; border-radius: .8rem; }
 .tab, .text-button { border: 0; background: transparent; cursor: pointer; font: inherit; }
 .tab { padding: .7rem; border-radius: .6rem; color: var(--muted); font-size: .75rem; font-weight: 700; }

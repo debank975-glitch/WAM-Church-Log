@@ -20,7 +20,7 @@ The Church Financial Log is a specialized, secure financial stewardship web appl
 | **9** | **Delete Records with Confirmation** | Records can be deleted with a confirmation prompt that recalculates running balances immediately upon deletion. |
 | **10** | **Budgets for Goals (Yearly, Quarterly, Monthly)** | Budget page and Goals page allow setting financial targets per category for Monthly, Quarterly, and Yearly intervals. Goals can also be edited and removed with confirmation. |
 | **11** | **Savings Aspects & Balance Tracking** | Dedicated Savings page tracking designated savings funds (Building Fund, Emergency Welfare, Youth Endowment) with deposit and withdrawal tracking. |
-| **12** | **Split Major Categories into Variants** | Clear hierarchy splitting categories into sub-variants (e.g. `Utilities` &rarr; `Water`, `Electricity`, `Wifi & Internet`, `Generator Fuel & Gas`). |
+| **12** | **User-defined Categories** | Users create the major categories and subcategories that fit their records; no category hierarchy is preloaded. |
 | **13** | **Dedicated Tithe Page (Physical vs. E-Cash)** | Dedicated Tithe page tracks member tithes and indicates whether contributions were made via Physical Money or E-Cash. |
 | **14 & 15** | **Mobile Money Wallet vs. Cash on Hand Custody** | Transactions require custody destination (`Mobile Money Wallet` vs `Cash on Hand`), with live custody balance cards and report sheet breakdown. |
 | **16** | **Description for Income & Expenditure** | Income and expenditure entries require detailed descriptions. Per specifications, **this description option does not apply to the Tithe page**. |

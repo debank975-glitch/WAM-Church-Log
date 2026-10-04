@@ -19,81 +19,11 @@ const DEFAULT_STATE = {
     ein: 'WAM-GH-2026 (Non-Profit / NGO)'
   },
   categories: {
-    INCOME: [
-      {
-        name: 'Tithes & Covenant Giving',
-        variants: ['General Tithes', 'First Fruits', 'Pastor Support Tithe']
-      },
-      {
-        name: 'Sunday Offerings',
-        variants: ['Sunday 1st Service Collection', 'Sunday 2nd Service Collection', 'Midweek Service Basket']
-      },
-      {
-        name: 'Building & Capital Campaign',
-        variants: ['Sanctuary Expansion', 'Roof Replacement Fund', 'Pews & Seating']
-      },
-      {
-        name: 'Missions & Evangelism',
-        variants: ['Northern Ghana Mission', 'Local Food Pantry Support', 'Prison Ministry Outreach']
-      },
-      {
-        name: 'Special Thanksgiving & Seed',
-        variants: ['Annual Harvest Seed', 'Child Dedication Thanksgiving', 'Wedding Thanksgiving']
-      },
-      {
-        name: 'Stewardship Goals',
-        variants: ['Sanctuary Sound Console', 'Harvest Goal Contributions', 'Community Food Drive']
-      },
-      {
-        name: 'Savings',
-        variants: ['Savings Withdrawal', 'Savings Transfer']
-      }
-    ],
-    EXPENSE: [
-      {
-        name: 'Utilities',
-        variants: ['Water', 'Electricity', 'Wifi & Internet', 'Generator Fuel & Gas']
-      },
-      {
-        name: 'Facilities & Maintenance',
-        variants: ['Sanctuary Cleaning', 'HVAC Service', 'Building Repairs & Paint', 'Security System']
-      },
-      {
-        name: 'Pastoral & Personnel',
-        variants: ['Senior Pastor Stipend', 'Youth Pastor Compensation', 'Guest Preacher Honorarium', 'Staff Benefits']
-      },
-      {
-        name: 'Audio, Visual & Media',
-        variants: ['Soundboard Cables & Mics', 'Livestream Cameras & Software', 'Projector Maintenance']
-      },
-      {
-        name: 'Worship & Music',
-        variants: ['Keyboard & Instruments', 'Sheet Music Licenses (CCLI)', 'Choir Robes & Supplies']
-      },
-      {
-        name: 'Administration & Office',
-        variants: ['Sunday Bulletin Printing', 'Accounting Software', 'MoMo & Service Charges', 'Postage']
-      },
-      {
-        name: 'Benevolence & Community',
-        variants: ['Emergency Family Relief', 'Food Pantry Groceries', 'Shelter Assistance']
-      },
-      {
-        name: 'Stewardship Goals',
-        variants: ['Console Equipment Purchase', 'Outreach Logistics', 'Community Food Distribution']
-      }
-    ]
+    INCOME: [],
+    EXPENSE: []
   },
-  budgets: {
-    'Utilities': { monthly: 1500, quarterly: 4500, yearly: 18000 },
-    'Facilities & Maintenance': { monthly: 1200, quarterly: 3600, yearly: 14400 },
-    'Pastoral & Personnel': { monthly: 4500, quarterly: 13500, yearly: 54000 },
-    'Audio, Visual & Media': { monthly: 600, quarterly: 1800, yearly: 7200 },
-    'Worship & Music': { monthly: 400, quarterly: 1200, yearly: 4800 },
-    'Administration & Office': { monthly: 500, quarterly: 1500, yearly: 6000 },
-    'Benevolence & Community': { monthly: 800, quarterly: 2400, yearly: 9600 },
-    'Stewardship Goals': { monthly: 1500, quarterly: 5000, yearly: 20000 }
-  },
+  categorySchemaVersion: 2,
+  budgets: {},
   savings: {
     totalBalance: 43500.00,
     history: [
@@ -131,233 +61,7 @@ const DEFAULT_STATE = {
       custody: 'Cash on Hand'
     }
   ],
-  transactions: [
-    // Income Transactions (Custody: Mobile Money Wallet vs Cash on Hand)
-    {
-      id: 'TX-INC-001',
-      type: 'INCOME',
-      date: '2026-09-07',
-      category: 'Sunday Offerings',
-      variant: 'Sunday 1st Service Collection',
-      entity: 'Sunday Congregation',
-      amount: 2480.00,
-      custody: 'Mobile Money Wallet',
-      description: 'First service open collection baskets deposited to church Mobile Money Wallet.',
-      recordedBy: 'Deacon Robert Vance'
-    },
-    {
-      id: 'TX-INC-002',
-      type: 'INCOME',
-      date: '2026-09-07',
-      category: 'Sunday Offerings',
-      variant: 'Sunday 2nd Service Collection',
-      entity: 'Sunday Congregation',
-      amount: 1940.00,
-      custody: 'Cash on Hand',
-      description: 'Second service collection retained in vault safe for weekly operational needs.',
-      recordedBy: 'Deacon Robert Vance'
-    },
-    {
-      id: 'TX-INC-003',
-      type: 'INCOME',
-      date: '2026-09-08',
-      category: 'Building & Capital Campaign',
-      variant: 'Sanctuary Expansion',
-      entity: 'Elder Robert & Martha Vance',
-      amount: 1500.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Pledge transfer for Phase 2 Sanctuary building wing expansion.',
-      recordedBy: 'Elder Martha Clark'
-    },
-    {
-      id: 'TX-INC-004',
-      type: 'INCOME',
-      date: '2026-09-09',
-      category: 'Missions & Evangelism',
-      variant: 'Northern Ghana Mission',
-      entity: 'Dr. Samuel & Grace Taylor',
-      amount: 600.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Direct MoMo transfer donation for medical evangelism outreach.',
-      recordedBy: 'Reverend Benjamin Eturu Adom'
-    },
-
-    // Tithes recorded via Tithe Page
-    {
-      id: 'TX-TITHE-20260907-1',
-      type: 'INCOME',
-      isTithe: true,
-      date: '2026-09-07',
-      category: 'Tithes & Covenant Giving',
-      variant: 'General Tithes',
-      entity: 'Jonathan & Sarah Edwards',
-      amount: 1250.00,
-      isECash: false, // Physical Cash
-      custody: 'Cash on Hand',
-      description: 'Tithe logged via Tithe Page [Physical Money]',
-      recordedBy: 'Reverend Benjamin Eturu Adom'
-    },
-    {
-      id: 'TX-TITHE-20260907-2',
-      type: 'INCOME',
-      isTithe: true,
-      date: '2026-09-07',
-      category: 'Tithes & Covenant Giving',
-      variant: 'General Tithes',
-      entity: 'Michael Chen',
-      amount: 750.00,
-      isECash: true, // E-Cash
-      custody: 'Mobile Money Wallet',
-      description: 'Tithe logged via Tithe Page [E-Cash / MoMo]',
-      recordedBy: 'Reverend Benjamin Eturu Adom'
-    },
-    {
-      id: 'TX-TITHE-20260910-1',
-      type: 'INCOME',
-      isTithe: true,
-      date: '2026-09-10',
-      category: 'Tithes & Covenant Giving',
-      variant: 'General Tithes',
-      entity: 'Hannah O\'Connor',
-      amount: 450.00,
-      isECash: true, // E-Cash
-      custody: 'Mobile Money Wallet',
-      description: 'Tithe logged via Tithe Page [E-Cash / MoMo]',
-      recordedBy: 'Elder Martha Clark'
-    },
-
-    // Goal Transactions (Requirement 14: Goals reflect in Income and Expenses)
-    {
-      id: 'TX-GOAL-INC-GOL-01',
-      type: 'INCOME',
-      isGoalSync: true,
-      goalId: 'GOL-01',
-      date: '2026-09-05',
-      category: 'Stewardship Goals',
-      variant: 'Sanctuary Sound Console',
-      entity: 'Stewardship Goal: New Sanctuary Audio Console',
-      amount: 6200.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Stewardship goal funds raised for New Sanctuary Audio Console',
-      recordedBy: 'Reverend Benjamin Eturu Adom'
-    },
-    {
-      id: 'TX-GOAL-EXP-GOL-01',
-      type: 'EXPENSE',
-      isGoalSync: true,
-      goalId: 'GOL-01',
-      date: '2026-09-06',
-      category: 'Stewardship Goals',
-      variant: 'Console Equipment Purchase',
-      entity: 'Stewardship Goal: New Sanctuary Audio Console',
-      amount: 4500.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Expenditure spent towards New Sanctuary Audio Console',
-      recordedBy: 'Reverend Benjamin Eturu Adom'
-    },
-    {
-      id: 'TX-GOAL-INC-GOL-03',
-      type: 'INCOME',
-      isGoalSync: true,
-      goalId: 'GOL-03',
-      date: '2026-09-02',
-      category: 'Stewardship Goals',
-      variant: 'Community Food Drive',
-      entity: 'Stewardship Goal: Monthly Community Food Pantry Drive',
-      amount: 950.00,
-      custody: 'Cash on Hand',
-      description: 'Stewardship goal funds raised for Monthly Community Food Pantry Drive',
-      recordedBy: 'Deacon Robert Vance'
-    },
-    {
-      id: 'TX-GOAL-EXP-GOL-03',
-      type: 'EXPENSE',
-      isGoalSync: true,
-      goalId: 'GOL-03',
-      date: '2026-09-04',
-      category: 'Stewardship Goals',
-      variant: 'Community Food Distribution',
-      entity: 'Stewardship Goal: Monthly Community Food Pantry Drive',
-      amount: 700.00,
-      custody: 'Cash on Hand',
-      description: 'Expenditure spent towards Monthly Community Food Pantry Drive',
-      recordedBy: 'Deacon Robert Vance'
-    },
-
-    // Expenses
-    {
-      id: 'TX-EXP-001',
-      type: 'EXPENSE',
-      date: '2026-09-03',
-      category: 'Utilities',
-      variant: 'Electricity',
-      entity: 'Electricity Company of Ghana (ECG)',
-      amount: 720.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Monthly electric power for sanctuary auditorium and offices.',
-      recordedBy: 'Elder Martha Clark'
-    },
-    {
-      id: 'TX-EXP-002',
-      type: 'EXPENSE',
-      date: '2026-09-04',
-      category: 'Utilities',
-      variant: 'Water',
-      entity: 'Ghana Water Company Ltd',
-      amount: 185.50,
-      custody: 'Mobile Money Wallet',
-      description: 'Facility water supply and sanitation utilities.',
-      recordedBy: 'Elder Martha Clark'
-    },
-    {
-      id: 'TX-EXP-003',
-      type: 'EXPENSE',
-      date: '2026-09-05',
-      category: 'Utilities',
-      variant: 'Wifi & Internet',
-      entity: 'MTN Business Fiber',
-      amount: 149.99,
-      custody: 'Mobile Money Wallet',
-      description: 'High-speed fiber line for livestreaming church worship services.',
-      recordedBy: 'Elder Martha Clark'
-    },
-    {
-      id: 'TX-EXP-004',
-      type: 'EXPENSE',
-      date: '2026-09-05',
-      category: 'Pastoral & Personnel',
-      variant: 'Senior Pastor Stipend',
-      entity: 'Reverend Benjamin Eturu Adom',
-      amount: 3200.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Monthly pastoral ministry honorarium and allowance.',
-      recordedBy: 'Elder Martha Clark'
-    },
-    {
-      id: 'TX-EXP-005',
-      type: 'EXPENSE',
-      date: '2026-09-08',
-      category: 'Benevolence & Community',
-      variant: 'Food Pantry Groceries',
-      entity: 'Local Community Market',
-      amount: 420.00,
-      custody: 'Cash on Hand',
-      description: 'Purchased dry staples and groceries for community pantry distribution.',
-      recordedBy: 'Deacon Robert Vance'
-    },
-    {
-      id: 'TX-EXP-006',
-      type: 'EXPENSE',
-      date: '2026-09-11',
-      category: 'Audio, Visual & Media',
-      variant: 'Soundboard Cables & Mics',
-      entity: 'Acoustic Sound Supplies',
-      amount: 310.00,
-      custody: 'Mobile Money Wallet',
-      description: 'Stage microphone cables and accessories.',
-      recordedBy: 'Elder Martha Clark'
-    }
-  ]
+  transactions: []
 };
 
 // Global active state
@@ -482,6 +186,11 @@ function normalizeState() {
   appState.currentInterval = appState.currentInterval || 'monthly';
   appState.budgets = appState.budgets || {};
   appState.categories = appState.categories || JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
+  if (appState.categorySchemaVersion < 2) {
+    appState.categories = { INCOME: [], EXPENSE: [] };
+    appState.budgets = {};
+    appState.categorySchemaVersion = 2;
+  }
   appState.currentUser = null;
   appState.savings = appState.savings || { totalBalance: 0, history: [] };
   if (!Array.isArray(appState.savings.history)) appState.savings.history = [];
@@ -511,7 +220,7 @@ function normalizeState() {
     ...transaction,
     amount: Number(transaction.amount) || 0,
     entity: transaction.entity || 'Unspecified',
-    category: transaction.category || 'Uncategorized',
+    category: String(transaction.category || '').trim(),
     recordedBy: transaction.recordedBy || 'Unknown user',
     custody: transaction.custody === 'Bank' ? 'Mobile Money Wallet' : (transaction.custody || 'Cash on Hand')
   }));
@@ -1246,6 +955,7 @@ function handleIncomeFormSubmit(e) {
         description,
         recordedBy: appState.currentUser.name
       });
+      registerCategory('INCOME', category, variant);
 
       saveAppState();
       renderCurrentPage();
@@ -1287,6 +997,7 @@ function handleExpenseFormSubmit(e) {
         description,
         recordedBy: appState.currentUser.name
       });
+      registerCategory('EXPENSE', category, variant);
 
       saveAppState();
       renderCurrentPage();
@@ -1319,6 +1030,22 @@ function populateSubcategories(categorySelectId, variantSelectId) {
     opt.value = 'General';
     opt.innerText = 'General';
     varSelect.appendChild(opt);
+  }
+
+  function registerCategory(type, name, variant) {
+    const categoryName = String(name || '').trim();
+    const variantName = String(variant || '').trim();
+    if (!categoryName) return;
+
+    const categories = appState.categories[type];
+    let category = categories.find(item => item.name.toLowerCase() === categoryName.toLowerCase());
+    if (!category) {
+      category = { name: categoryName, variants: [] };
+      categories.push(category);
+    }
+    if (variantName && !category.variants.some(item => item.toLowerCase() === variantName.toLowerCase())) {
+      category.variants.push(variantName);
+    }
   }
 }
 
@@ -1451,6 +1178,8 @@ function openTitheDayModal(dayDateStr) {
   // Reset inputs (Requirement 16: description does not apply to tithe page)
   document.getElementById('titheDonorName').value = '';
   document.getElementById('titheAmount').value = '';
+  document.getElementById('titheCategory').value = '';
+  document.getElementById('titheSubcategory').value = '';
   document.getElementById('titheIsTithe').checked = true;
   document.getElementById('titheIsECash').checked = false;
   renderPendingTitheEntries();
@@ -1462,16 +1191,20 @@ function openTitheDayModal(dayDateStr) {
 function queueDayTitheEntry() {
   const donor = document.getElementById('titheDonorName').value.trim();
   const amount = parseFloat(document.getElementById('titheAmount').value);
+  const category = document.getElementById('titheCategory').value.trim();
+  const variant = document.getElementById('titheSubcategory').value.trim();
   const isECash = document.getElementById('titheIsECash').checked;
 
-  if (!donor || isNaN(amount) || amount <= 0) {
-    alert('Please enter member name and tithe amount.');
+  if (!donor || !category || !variant || isNaN(amount) || amount <= 0) {
+    alert('Please enter the donor/entity, category, subcategory, and amount.');
     return;
   }
 
-  pendingTitheEntries.push({ donor, amount, isECash });
+  pendingTitheEntries.push({ donor, amount, category, variant, isECash });
   document.getElementById('titheDonorName').value = '';
   document.getElementById('titheAmount').value = '';
+  document.getElementById('titheCategory').value = '';
+  document.getElementById('titheSubcategory').value = '';
   document.getElementById('titheIsECash').checked = false;
   renderPendingTitheEntries();
 }
@@ -1515,8 +1248,8 @@ function saveDayTitheEntries() {
           type: 'INCOME',
           isTithe: true,
           date: activeTitheDayDate,
-          category: 'Tithes & Covenant Giving',
-          variant: 'General Tithes',
+          category: entry.category,
+          variant: entry.variant,
           entity: entry.donor,
           amount: entry.amount,
           isECash: entry.isECash,
@@ -1524,6 +1257,7 @@ function saveDayTitheEntries() {
           description: `Tithe logged for ${activeTitheDayDate} [${entry.isECash ? 'E-Cash' : 'Physical Money'}]`,
           recordedBy: appState.currentUser.name
         });
+        registerCategory('INCOME', entry.category, entry.variant);
       });
       pendingTitheEntries = [];
       saveAppState();
@@ -1770,8 +1504,8 @@ function handleSavingsWithdrawSubmit(e) {
       savingsRecordId,
       type: 'INCOME',
       date: new Date().toISOString().split('T')[0],
-      category: 'Savings',
-      variant: 'Savings Withdrawal',
+      category: '',
+      variant: '',
       entity: 'Church Savings Account',
       amount,
       custody,
@@ -1835,8 +1569,8 @@ function handleEditSavingsRecordSubmit(e) {
         savingsRecordId: id,
         type: 'INCOME',
         date: updated.date,
-        category: 'Savings',
-        variant: 'Savings Withdrawal',
+        category: '',
+        variant: '',
         entity: 'Church Savings Account',
         amount: updated.amount,
         custody: updated.custody,
@@ -2060,7 +1794,7 @@ function syncGoalTransactions(goal) {
   const base = {
     goalId: goal.id,
     date,
-    category: 'Stewardship Goals',
+    category: '',
     entity: `Stewardship Goal: ${goal.title}`,
     custody: goal.custody,
     recordedBy: appState.currentUser.name,
@@ -2460,15 +2194,9 @@ function openModal(id) {
   if (!modal) return;
 
   if (id === 'modalIncome') {
-    populateCategorySelect('incCategory', 'INCOME');
-    populateSubcategories('incCategory', 'incVariant');
     document.getElementById('incDate').value = new Date().toISOString().split('T')[0];
   } else if (id === 'modalExpense') {
-    populateCategorySelect('expCategory', 'EXPENSE');
-    populateSubcategories('expCategory', 'expVariant');
     document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
-  } else if (id === 'modalAddBudget') {
-    populateCategorySelect('budgetCategorySelect', 'EXPENSE');
   } else if (id === 'modalManageCategories') {
     renderCategoryManager();
   } else if (id === 'modalPrintReport') {
@@ -2579,7 +2307,7 @@ function handleCreateMajorCategory() {
     () => {
       appState.categories[type].push({
         name,
-        variants: ['General']
+        variants: []
       });
       if (type === 'EXPENSE' && !appState.budgets[name]) {
         appState.budgets[name] = { monthly: 0, quarterly: 0, yearly: 0 };

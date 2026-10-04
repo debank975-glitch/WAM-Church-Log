@@ -9,6 +9,9 @@
   --wam-gold: #c7983e;
   --wam-gold-soft: #f5ead2;
   --wam-sage: #2f6b58;
+  --wam-wine: #7a2948;
+  --wam-wine-deep: #541a32;
+  --wam-wine-soft: #f7e9ee;
   --wam-ink: #263746;
   --wam-muted: #70808a;
   --wam-line: rgba(23, 50, 77, .12);
@@ -401,7 +404,7 @@ body > .flex-1 > header {
   backdrop-filter: blur(18px);
 }
 .app-sidebar {
-  background: linear-gradient(180deg, var(--wam-navy-deep), #0d1d2c) !important;
+  background: linear-gradient(180deg, var(--wam-wine-deep), #3f1427) !important;
   border-right: 1px solid rgba(255, 255, 255, .06);
 }
 .app-sidebar .border-b,
@@ -414,6 +417,19 @@ body > .flex-1 > header {
 .app-sidebar .text-accent-300 { color: #e8c778 !important; }
 .app-sidebar .nav-item:hover { background: rgba(255, 255, 255, .065); }
 .app-sidebar .nav-item.active { color: #fff !important; }
+
+.bg-church-950 { background-color: var(--wam-wine-deep) !important; }
+.bg-church-900 { background-color: #68223f !important; }
+.bg-church-800 { background-color: #7a2948 !important; }
+.text-accent-400,
+.text-accent-300 { color: #dca0b7 !important; }
+.bg-accent-500\/20 { background-color: rgba(122, 41, 72, .2) !important; }
+.border-accent-400\/30 { border-color: rgba(220, 160, 183, .3) !important; }
+.bg-brand-700 { background-color: var(--wam-wine) !important; }
+.bg-brand-800 { background-color: var(--wam-wine-deep) !important; }
+.text-brand-700 { color: var(--wam-wine) !important; }
+.bg-brand-50 { background-color: var(--wam-wine-soft) !important; }
+.border-brand-200 { border-color: #e8cbd6 !important; }
 
 .page-view > .bg-white,
 .page-view > .bg-gradient-to-r,
