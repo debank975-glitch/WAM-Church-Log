@@ -136,7 +136,12 @@ router.delete(['/admin/users/:id', '/users/:id'], requireAuth, requireAdmin, asy
   if (targetUser.role === 'admin') return res.status(403).json({ error: 'Cannot delete an administrator account' });
 
   try {
-    await db.prepare('DELETE FROM users WHERE id=?').run(targetId);
+    await db.transaction((tx) => {
+      const connection = tx || db;
+      connection.prepare('UPDATE audit_log SET user_id=NULL WHERE user_id=?').run(targetId);
+      connection.prepare('DELETE FROM invite_codes WHERE created_by=?').run(targetId);
+      connection.prepare('DELETE FROM users WHERE id=?').run(targetId);
+    })();
     await audit('delegated_user_deleted', req, req.user, { deletedUserId: targetId, username: targetUser.username });
     res.json({ success: true, deletedId: targetId });
   } catch (error) {

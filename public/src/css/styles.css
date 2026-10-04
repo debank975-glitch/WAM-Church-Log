@@ -1,9 +1,73 @@
-/* Church Financial Log & Stewardship Stylesheet - World Ark Missions */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+/* World Ark Missions premium dashboard system */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --wam-ivory: #f8f7f2;
+  --wam-surface: #fffefa;
+  --wam-navy: #17324d;
+  --wam-navy-deep: #102536;
+  --wam-gold: #c7983e;
+  --wam-gold-soft: #f5ead2;
+  --wam-sage: #2f6b58;
+  --wam-ink: #263746;
+  --wam-muted: #70808a;
+  --wam-line: rgba(23, 50, 77, .12);
+  --wam-radius-sm: 10px;
+  --wam-radius-md: 16px;
+  --wam-radius-lg: 22px;
+  --wam-shadow-sm: 0 8px 24px rgba(23, 50, 77, .06);
+  --wam-shadow-md: 0 18px 48px rgba(23, 50, 77, .1);
+  --wam-ease: cubic-bezier(.4, 0, .2, 1);
+  --wam-ease-out: cubic-bezier(.22, 1, .36, 1);
+}
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  letter-spacing: -0.011em;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  background: var(--wam-ivory) !important;
+  color: var(--wam-ink);
+}
+
+h1, h2, h3, h4 { font-family: 'Merriweather', Georgia, serif; letter-spacing: -.025em; }
+button, input, select, textarea { font-family: inherit; }
+button { transition: transform 180ms var(--wam-ease), box-shadow 180ms var(--wam-ease), background-color 180ms var(--wam-ease), border-color 180ms var(--wam-ease); }
+button:hover { transform: translateY(-1px); }
+button:active { transform: scale(.98); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(199, 152, 62, .35); outline-offset: 2px; }
+.wam-logo {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid rgba(199, 152, 62, .45);
+  border-radius: 13px;
+  color: var(--wam-gold);
+  background: linear-gradient(145deg, rgba(199, 152, 62, .2), rgba(255, 255, 255, .04));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .16);
+  font: 700 11px/1 'Open Sans', sans-serif;
+  letter-spacing: .08em;
+}
+.wam-logo img,
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--wam-gold-soft);
+  color: var(--wam-navy);
+  border: 1px solid rgba(199, 152, 62, .5);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .04em;
 }
 
 html,
@@ -28,9 +92,9 @@ body {
 
 /* Sidebar navigation active style */
 .nav-item.active {
-  background-color: #1e293b;
+  background-color: rgba(255, 255, 255, .09);
   color: #f8fafc;
-  box-shadow: inset 3px 0 0 #f59e0b;
+  box-shadow: inset 3px 0 0 var(--wam-gold);
 }
 
 /* Time interval buttons */
@@ -42,15 +106,15 @@ body {
 
 /* Rounded Tithe Date Box styling (Requirement 17) */
 .tithe-day-card {
-  transition: all 0.2s ease-in-out;
+  transition: transform 220ms var(--wam-ease-out), box-shadow 220ms var(--wam-ease-out), border-color 220ms var(--wam-ease);
   cursor: pointer;
   border-radius: 1.25rem; /* rounded-2xl */
 }
 
 .tithe-day-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  border-color: #f59e0b;
+  box-shadow: var(--wam-shadow-sm);
+  border-color: var(--wam-gold);
 }
 
 .tithe-day-card.has-tithes {
@@ -328,4 +392,64 @@ body.sidebar-collapsed-page .app-sidebar {
   .border {
     border-color: #cbd5e1 !important;
   }
+}
+
+/* Calm surfaces and dashboard hierarchy */
+body > .flex-1 > header {
+  background: rgba(255, 254, 250, .88) !important;
+  border-color: var(--wam-line) !important;
+  backdrop-filter: blur(18px);
+}
+.app-sidebar {
+  background: linear-gradient(180deg, var(--wam-navy-deep), #0d1d2c) !important;
+  border-right: 1px solid rgba(255, 255, 255, .06);
+}
+.app-sidebar .border-b,
+.app-sidebar .border-t { border-color: rgba(255, 255, 255, .09) !important; }
+.app-sidebar .bg-church-900\/60,
+.app-sidebar .bg-church-900 { background: rgba(255, 255, 255, .045) !important; }
+.app-sidebar .bg-church-950 { background: rgba(0, 0, 0, .18) !important; }
+.app-sidebar .bg-brand-600 { background: var(--wam-gold) !important; color: var(--wam-navy) !important; }
+.app-sidebar .text-accent-400,
+.app-sidebar .text-accent-300 { color: #e8c778 !important; }
+.app-sidebar .nav-item:hover { background: rgba(255, 255, 255, .065); }
+.app-sidebar .nav-item.active { color: #fff !important; }
+
+.page-view > .bg-white,
+.page-view > .bg-gradient-to-r,
+.page-view > .bg-gradient-to-br,
+.page-view .bg-white {
+  border-color: var(--wam-line) !important;
+  box-shadow: var(--wam-shadow-sm) !important;
+}
+.page-view > .bg-white:hover,
+.page-view .bg-white:hover { box-shadow: var(--wam-shadow-md) !important; }
+.page-view h2 { color: var(--wam-navy) !important; }
+.page-view p.text-slate-500,
+.page-view span.text-slate-500 { color: var(--wam-muted) !important; }
+.interval-btn.active { color: var(--wam-navy) !important; }
+
+.fixed.inset-0 > div {
+  border: 1px solid var(--wam-line);
+  box-shadow: var(--wam-shadow-md);
+}
+.fixed.inset-0 .bg-church-950 { background: var(--wam-navy-deep) !important; }
+.fixed.inset-0 input,
+.fixed.inset-0 select,
+.fixed.inset-0 textarea {
+  border-color: var(--wam-line) !important;
+  background: #fcfbf7 !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-view > * {
+    animation: wam-rise 650ms var(--wam-ease-out) both;
+  }
+  .page-view > *:nth-child(2) { animation-delay: 70ms; }
+  .page-view > *:nth-child(3) { animation-delay: 140ms; }
+  .page-view > *:nth-child(4) { animation-delay: 210ms; }
+}
+@keyframes wam-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }

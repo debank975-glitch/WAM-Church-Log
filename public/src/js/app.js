@@ -633,7 +633,7 @@ async function setupUserSession() {
       return;
     }
   } catch (error) {
-    console.warn('Unable to restore authenticated session:', error.message);
+    // The auth page is the user-facing recovery surface for an invalid session.
   }
   window.location.replace('/auth.html');
 }

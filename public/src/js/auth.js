@@ -22,12 +22,9 @@
   }
 
   function showMessage(text, type = 'error') {
-    const attempt = Number(message.dataset.attempt || 0) + 1;
-    message.dataset.attempt = String(attempt);
-    const isCredentialError = text === 'Wrong Username or Password';
-    message.textContent = isCredentialError
-      ? `Attempt ${attempt}: The username/email or password is still incorrect. Please check both and try again.`
-      : `Attempt ${attempt}: ${text}`;
+    message.textContent = text === 'Wrong Username or Password'
+      ? 'The username or password is incorrect. Please try again.'
+      : text;
     message.className = `message ${type === 'success' ? 'success' : ''}`;
     message.classList.remove('message-refresh');
     void message.offsetWidth;
@@ -45,12 +42,11 @@
     document.getElementById('adminTab').setAttribute('aria-selected', String(isAdmin));
     document.getElementById('userTab').setAttribute('aria-selected', String(!isAdmin));
     message.className = 'message hidden';
-    message.dataset.attempt = '0';
   }
 
   const reason = new URLSearchParams(window.location.search).get('reason');
   if (reason === 'session-expired') {
-    showMessage('Your session expired or is no longer valid. Please sign in again before continuing.');
+    showMessage('Your session has ended. Please sign in again.');
   }
 
   function setAuthenticatedUser(payload, form) {
