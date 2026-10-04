@@ -18,7 +18,7 @@ The project is a single-page financial client backed by an Express API. Its sour
 └── CHURCH_FINANCIAL_LOG_SPECS.md
 ```
 
-The existing single-page behavior is intentionally preserved while authenticated ledger snapshots are loaded from and saved to the backend. The next maintainability step should be splitting `src/js/app.js` into domain modules such as authentication, ledger, budgets, savings, goals, reporting, and UI rendering.
+The existing single-page behavior is intentionally preserved while the shared church ledger snapshot is loaded from and saved to the backend. Authentication remains account-specific, but every authenticated account reads and writes the same ledger record. The next maintainability step should be splitting `src/js/app.js` into domain modules such as authentication, ledger, budgets, savings, goals, reporting, and UI rendering.
 
 ## Authentication flow
 

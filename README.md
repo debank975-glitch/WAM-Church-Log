@@ -41,7 +41,7 @@ Copy-Item .env.example .env
 npm start
 ```
 
-Then open `http://localhost:3000/auth.html`. Authentication is intentionally hosted on its own standalone page; successful sign-in redirects to the financial dashboard at `/`, while unauthenticated dashboard visits redirect back to `/auth.html`. Authentication and each user's financial ledger are stored on the configured backend.
+Then open `http://localhost:3000/auth.html`. Authentication is intentionally hosted on its own standalone page; successful sign-in redirects to the financial dashboard at `/`, while unauthenticated dashboard visits redirect back to `/auth.html`. Authentication is account-specific, while all authenticated users share the church's single financial ledger.
 
 ## Database provider
 
