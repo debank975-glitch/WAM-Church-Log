@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: hermes-financial-log
+    name: wam-financial-log
     env: node
     plan: free
     buildCommand: npm install --omit=dev
@@ -39,7 +39,7 @@ services:
       - key: GMAIL_SENDER
         sync: false
       - key: GMAIL_REDIRECT_URI
-        value: https://hermes-financial-log.onrender.com/oauth2callback
+        value: https://wam-financial-log.onrender.com/oauth2callback
       - key: GMAIL_OAUTH_SETUP_KEY
         sync: false
       - key: ADMIN_EMAIL

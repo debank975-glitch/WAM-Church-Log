@@ -59,7 +59,7 @@ Existing local SQLite data is not automatically migrated to PostgreSQL. Export o
 3. Set `DATABASE_URL` to the Supabase connection string and keep `DATABASE_PROVIDER=postgres`.
 4. Add strong random values for `SESSION_SECRET` and `ADMIN_SETUP_CODE`.
 5. Gmail API OAuth is optional and is not required for delegated-account creation.
-6. Deploy and open the Render-provided `https://*.onrender.com/auth.html` URL.
+6. Deploy and open `https://wam-financial-log.onrender.com/auth.html`.
 
 The free Render service may sleep when idle, and Supabase free projects have usage and inactivity limits. Keep regular database backups before using the site for official financial records.
 
