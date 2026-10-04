@@ -1205,27 +1205,16 @@
 
       <form id="formUser" onsubmit="handleCreateUserSubmit(event)" class="p-6 space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Full Name / Officer *</label>
+          <label class="block font-bold text-slate-700 mb-1">Full Name / Officer</label>
           <input type="text" id="userNewName" placeholder="e.g. Elder Martha Clark" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Role Title *</label>
-            <select id="userNewRole" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-medium">
-              <option value="Finance Secretary">Finance Secretary</option>
-              <option value="Counting Trustee">Counting Trustee</option>
-              <option value="Auditor">Internal Auditor</option>
-              <option value="Assistant Pastor">Assistant Pastor</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Username / Login ID *</label>
-            <input type="text" id="userNewUsername" placeholder="e.g. martha.clark" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
-          </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Username / Login ID</label>
+          <input type="text" id="userNewUsername" placeholder="e.g. martha.clark" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Temporary Password *</label>
+            <label class="block font-bold text-slate-700 mb-1">Temporary Password</label>
             <input type="password" id="userNewPin" placeholder="At least 8 characters" minlength="8" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono">
           </div>
           <div>

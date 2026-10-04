@@ -2233,7 +2233,6 @@ async function handleCreateUserSubmit(e) {
 
   const name = document.getElementById('userNewName')?.value.trim();
   const username = document.getElementById('userNewUsername')?.value.trim();
-  const roleTitle = document.getElementById('userNewRole')?.value;
   const pin = document.getElementById('userNewPin')?.value;
   const email = document.getElementById('userNewEmail')?.value.trim();
 
@@ -2262,7 +2261,6 @@ async function handleCreateUserSubmit(e) {
         displayName: name,
         username,
         password: pin,
-        roleTitle,
         email: email || null,
         permissions
       })
@@ -2271,7 +2269,7 @@ async function handleCreateUserSubmit(e) {
     closeModal('modalCreateUser');
     e.target.reset();
     await loadServerUsers();
-    alert(`Delegated account created successfully for ${payload.user?.displayName || name} (${roleTitle}).`);
+    alert(`Delegated account created successfully for ${payload.user?.displayName || name}.`);
   } catch (error) {
     // Show error directly in modal without logging the admin out of the homepage
     if (alertEl) {

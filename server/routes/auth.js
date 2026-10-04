@@ -92,7 +92,7 @@ router.get(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, re
 router.post(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, res) => {
   const username = String(req.body.username || req.body.email || '').trim();
   const password = String(req.body.password || req.body.pin || '');
-  const roleTitle = String(req.body.roleTitle || req.body.role || 'Finance Secretary').trim();
+  const roleTitle = 'Delegated Officer';
   const displayName = String(req.body.displayName || req.body.name || username).trim();
   const email = req.body.email ? String(req.body.email).trim() : null;
   const permissions = Array.isArray(req.body.permissions) ? req.body.permissions : ['Log Income & Tithes'];
@@ -100,14 +100,12 @@ router.post(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, r
   if (!username) return res.status(400).json({ error: 'Username or email is required' });
   if (password.length < 8) return res.status(400).json({ error: 'Temporary password must be at least 8 characters' });
 
-  const existing = await db.prepare('SELECT 1 FROM users WHERE LOWER(username)=LOWER(?)').get(username);
-  if (existing) return res.status(409).json({ error: `Account with username/email "${username}" already exists` });
-
   try {
-    const info = await db.prepare(`
+    const insertSql = `
       INSERT INTO users (username, password_hash, role, role_title, permissions, email, display_name, must_change_password)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)${sqlReturningId()}
-    `).run(
+    `;
+    const insertValues = [
       username,
       passwordHash(password),
       'user',
@@ -116,13 +114,38 @@ router.post(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, r
       email,
       displayName,
       passwordChangeFlag(true)
-    );
+    ];
+    let info;
+    if (config.databaseProvider === 'postgres') {
+      info = await db.transaction(async (tx) => {
+        const existing = await tx.prepare('SELECT 1 FROM users WHERE LOWER(username)=LOWER(?)').get(username);
+        if (existing) {
+          const duplicate = new Error('Account already exists');
+          duplicate.code = 'DUPLICATE_ACCOUNT';
+          throw duplicate;
+        }
+        return tx.prepare(insertSql).run(...insertValues);
+      })();
+    } else {
+      info = db.transaction((tx) => {
+        const existing = db.prepare('SELECT 1 FROM users WHERE LOWER(username)=LOWER(?)').get(username);
+        if (existing) {
+          const duplicate = new Error('Account already exists');
+          duplicate.code = 'DUPLICATE_ACCOUNT';
+          throw duplicate;
+        }
+        return db.prepare(insertSql).run(...insertValues);
+      })();
+    }
     const user = await db.prepare('SELECT * FROM users WHERE id=?').get(info.lastInsertRowid || info.id || info.rows?.[0]?.id);
     await audit('delegated_user_created', req, req.user, { createdUserId: user.id, username, roleTitle });
     res.status(201).json({ user: publicUser(user) });
   } catch (error) {
-    console.error('Create delegated user failed:', error);
-    res.status(500).json({ error: error.message || 'Failed to create delegated user account' });
+    if (error.code === 'DUPLICATE_ACCOUNT' || error.code === '23505' || error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return res.status(409).json({ error: `Account with username/email "${username}" already exists` });
+    }
+    console.error('Create delegated user failed:', { code: error.code, message: error.message });
+    res.status(500).json({ error: 'Unable to create delegated account. Check the deployment database configuration.' });
   }
 });
 

@@ -3,7 +3,7 @@
 1. Copy `.env.example` to `.env` and replace `SESSION_SECRET` and `ADMIN_SETUP_CODE` with long random values. There are no default credentials.
 2. Run `npm install`, then `npm start`. The existing `index.html` and frontend assets are served unchanged.
 3. Create the sole administrator with `POST /api/auth/admin/setup` using `{ "username", "email", "password", "setupCode", "displayName" }`. The setup code is never persisted and registration is rejected after an admin exists. The legacy `/api/auth/admin/register` alias remains available.
-4. An authenticated admin creates delegated accounts directly with `POST /api/auth/admin/users` using `{ "username", "password", "roleTitle", "permissions", "email", "displayName" }`. The initial password is stored only as a salted hash and the user must choose a new password at first sign-in.
+4. An authenticated admin creates delegated accounts directly with `POST /api/auth/admin/users` using `{ "username", "password", "permissions", "email", "displayName" }`. The account receives the default role title `Delegated Officer`. The initial password is stored only as a salted hash and the user must choose a new password at first sign-in.
 5. Users log in at `POST /api/auth/user/login`. A first-login account must complete `POST /api/auth/change-password` with a new password of at least 12 characters before ledger access is allowed.
 
 ## Frontend-friendly API
