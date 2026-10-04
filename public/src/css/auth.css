@@ -44,9 +44,11 @@ body {
 .auth-form input { width: 100%; padding: .85rem .9rem; border: 1px solid var(--line); border-radius: .7rem; outline: 0; color: var(--ink); background: #fbfcfb; font: inherit; font-size: .85rem; }
 .auth-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,123,86,.12); }
 .password-wrapper { position: relative; }
-.password-wrapper input { padding-right: 2.8rem; }
-.password-toggle { position: absolute; right: .65rem; bottom: .62rem; top: auto; transform: none; min-height: 2.25rem; min-width: 3.25rem; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 800; padding: .25rem .4rem; color: var(--green-dark); }
-.password-toggle:hover { color: var(--ink); }
+.password-wrapper input { padding-right: 3rem; }
+.password-toggle { position: absolute; right: .45rem; top: 2.05rem; transform: translateY(-50%); width: 2.35rem; height: 2.35rem; display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; border: 0; border-radius: .55rem; background: transparent; color: var(--green-dark); cursor: pointer; }
+.password-toggle:hover { color: var(--ink); background: rgba(122, 41, 72, .08); }
+.password-toggle:focus-visible { outline: 3px solid rgba(122, 41, 72, .25); outline-offset: 1px; }
+.password-icon { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
 .primary-button { display: flex; align-items: center; justify-content: space-between; margin-top: .25rem; padding: .9rem 1rem; border: 0; border-radius: .7rem; background: var(--green-dark); color: #fff; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 800; box-shadow: 0 8px 18px rgba(23, 50, 77, .15); }
 .primary-button:hover { background: var(--green); }

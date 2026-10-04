@@ -117,19 +117,19 @@
     }
   });
 
-    // Password visibility toggles
-    document.querySelectorAll('.password-toggle').forEach(button => {
-      button.addEventListener('click', () => {
-        const targetId = button.dataset.target;
-        const input = document.getElementById(targetId);
-        if (input) {
-          const isPassword = input.type === 'password';
-          input.type = isPassword ? 'text' : 'password';
-          button.textContent = isPassword ? 'Hide' : 'Show';
-          button.setAttribute('aria-label', isPassword ? 'Hide value' : 'Show value');
-        }
-      });
+  const eyeIcon = '<svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>';
+  const eyeOffIcon = '<svg class="password-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18"></path><path d="M10.6 5.2A10.7 10.7 0 0 1 12 5c6 0 9.5 7 9.5 7a17.7 17.7 0 0 1-3.1 3.8"></path><path d="M6.2 6.3C3.8 8 2.5 12 2.5 12s3.5 7 9.5 7a10.7 10.7 0 0 0 4.1-.8"></path></svg>';
+  document.querySelectorAll('.password-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.target);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      button.innerHTML = isPassword ? eyeOffIcon : eyeIcon;
+      button.setAttribute('aria-label', isPassword ? 'Hide value' : 'Show value');
+      button.setAttribute('aria-pressed', String(isPassword));
     });
+  });
 
     apiRequest('/api/auth/me').then(payload => {
     if (payload.user?.mustChangePassword) showPanel('passwordChange');

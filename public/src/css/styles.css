@@ -37,6 +37,11 @@ button { transition: transform 180ms var(--wam-ease), box-shadow 180ms var(--wam
 button:hover { transform: translateY(-1px); }
 button:active { transform: scale(.98); }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(199, 152, 62, .35); outline-offset: 2px; }
+.password-field { position: relative; }
+.password-field input { padding-right: 3rem; }
+.password-field .password-toggle { position: absolute; right: .45rem; top: 50%; transform: translateY(-50%); width: 2.35rem; height: 2.35rem; display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; border: 0; border-radius: .55rem; background: transparent; color: var(--wam-wine-deep); cursor: pointer; }
+.password-field .password-toggle:hover { color: var(--wam-ink); background: rgba(122, 41, 72, .08); }
+.password-icon { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 .wam-logo {
   display: grid;
   place-items: center;
