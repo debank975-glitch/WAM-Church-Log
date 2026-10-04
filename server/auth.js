@@ -29,6 +29,7 @@ const verifySignedToken = (value) => {
 };
 const now = () => new Date();
 const expires = (days) => new Date(Date.now() + days * 86400000).toISOString();
+const expiresMinutes = (minutes) => new Date(Date.now() + minutes * 60000).toISOString();
 
 async function audit(event, req, user, metadata = {}) {
   await db.prepare('INSERT INTO audit_log (event,user_id,username,ip,metadata) VALUES (?,?,?,?,?)').run(
@@ -51,10 +52,15 @@ async function createSession(user) {
 }
 
 async function userFromRequest(req) {
-  const raw = verifySignedToken(req.cookies?.hermes_session);
+  let token = req.cookies?.hermes_session;
+  if (!token && req.headers?.authorization) {
+    const match = String(req.headers.authorization).match(/^Bearer\s+(.+)$/i);
+    if (match) token = match[1].trim();
+  }
+  const raw = verifySignedToken(token);
   if (!raw) return null;
   const row = await db.prepare(`
-    SELECT u.id,u.username,u.role,u.email,u.display_name,s.expires_at
+    SELECT u.id,u.username,u.role,u.role_title,u.permissions,u.email,u.display_name,u.must_change_password,s.expires_at
     FROM sessions s JOIN users u ON u.id=s.user_id
     WHERE s.token_hash=? AND s.expires_at > ?
   `).get(hash(raw), now().toISOString());
@@ -65,10 +71,15 @@ async function userFromRequest(req) {
 }
 
 async function clearSession(req) {
-  const raw = verifySignedToken(req.cookies?.hermes_session);
+  let token = req.cookies?.hermes_session;
+  if (!token && req.headers?.authorization) {
+    const match = String(req.headers.authorization).match(/^Bearer\s+(.+)$/i);
+    if (match) token = match[1].trim();
+  }
+  const raw = verifySignedToken(token);
   if (raw) {
     await db.prepare('DELETE FROM sessions WHERE token_hash=?').run(hash(raw));
   }
 }
 
-module.exports = { db, hash, passwordHash, verifyPassword, randomCode, createSession, userFromRequest, clearSession, audit, expires };
+module.exports = { db, hash, passwordHash, verifyPassword, randomCode, createSession, userFromRequest, clearSession, audit, expires, expiresMinutes };

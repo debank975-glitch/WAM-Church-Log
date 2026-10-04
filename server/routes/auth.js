@@ -1,21 +1,43 @@
 const express = require('express');
 const config = require('../config');
-const { db, hash, passwordHash, verifyPassword, randomCode, createSession, audit, expires, clearSession } = require('../auth');
+const { db, passwordHash, verifyPassword, createSession, audit, clearSession } = require('../auth');
 const { rateLimit, requireAuth, requireAdmin } = require('../middleware');
-const { configured, sendInvite } = require('../mailer');
 
 const router = express.Router();
 const authLimiter = rateLimit;
-const cookieOptions = { httpOnly: true, sameSite: 'lax', secure: config.nodeEnv === 'production', maxAge: config.sessionTtlDays * 86400000, path: '/' };
+const cookieOptions = { httpOnly: true, sameSite: 'lax', secure: false, maxAge: config.sessionTtlDays * 86400000, path: '/' };
+const passwordChangeFlag = (required) => config.databaseProvider === 'postgres' ? required : (required ? 1 : 0);
 const credentials = (body) => ({ username: String(body.username || '').trim(), password: String(body.password || '') });
 const invalidLogin = (res) => res.status(401).json({ error: 'Wrong Username or Password' });
-const publicUser = (user) => ({
-  id: user.id, username: user.username, role: user.role, email: user.email,
-  displayName: user.display_name || null
-});
+const publicUser = (user) => {
+  let permissions = [];
+  if (user.permissions) {
+    try {
+      permissions = typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions;
+    } catch {
+      permissions = [];
+    }
+  } else if (user.role === 'admin') {
+    permissions = ['home', 'quota', 'tithe', 'savings', 'goals', 'charts', 'editUsers'];
+  } else {
+    permissions = ['home', 'tithe', 'savings'];
+  }
+  return {
+    id: user.id,
+    username: user.username,
+    role: user.role,
+    roleTitle: user.role_title || (user.role === 'admin' ? 'Lead Administrator' : 'Delegated'),
+    email: user.email,
+    displayName: user.display_name || user.username,
+    mustChangePassword: Boolean(user.must_change_password),
+    permissions
+  };
+};
 const registrationValues = (body) => ({
   email: body.email ? String(body.email).trim() : null,
-  displayName: body.displayName ? String(body.displayName).trim() : null
+  displayName: body.displayName ? String(body.displayName).trim() : null,
+  roleTitle: body.roleTitle ? String(body.roleTitle).trim() : null,
+  permissions: body.permissions ? (Array.isArray(body.permissions) ? JSON.stringify(body.permissions) : String(body.permissions)) : null
 });
 const sqlReturningId = () => (config.databaseProvider === 'postgres' ? ' RETURNING id' : '');
 
@@ -26,96 +48,115 @@ async function setupAdmin(req, res) {
   const existingAdmin = await db.prepare("SELECT 1 FROM users WHERE role='admin'").get();
   if (existingAdmin) return res.status(409).json({ error: 'Admin account already exists' });
   const values = registrationValues(req.body);
-  const info = await db.prepare(`INSERT INTO users (username,password_hash,role,email,display_name) VALUES (?,?,?,?,?)${sqlReturningId()}`).run(username, passwordHash(password), 'admin', values.email, values.displayName);
+  const info = await db.prepare(`INSERT INTO users (username,password_hash,role,email,display_name,role_title,must_change_password) VALUES (?,?,?,?,?,?,?)${sqlReturningId()}`).run(username, passwordHash(password), 'admin', values.email, values.displayName, 'Lead Administrator', passwordChangeFlag(false));
   const user = await db.prepare('SELECT * FROM users WHERE id=?').get(info.lastInsertRowid || info.id || info.rows?.[0]?.id);
   await audit('admin_registered', req, user);
-  res.cookie('hermes_session', await createSession(user), cookieOptions);
-  res.status(201).json({ user: publicUser(user) });
+  const token = await createSession(user);
+  res.cookie('hermes_session', token, cookieOptions);
+  res.status(201).json({ user: publicUser(user), token });
 }
 router.post(['/admin/register', '/admin/setup'], authLimiter, setupAdmin);
 
 router.post('/admin/login', authLimiter, async (req, res) => {
   const { username, password } = credentials(req.body);
-  const user = await db.prepare("SELECT * FROM users WHERE username=? AND role='admin'").get(username);
+  const user = await db.prepare("SELECT * FROM users WHERE LOWER(username)=LOWER(?) AND role='admin'").get(username);
   if (!user || !verifyPassword(password, user.password_hash)) { await audit('admin_login_failed', req, user, { username }); return invalidLogin(res); }
-  res.cookie('hermes_session', await createSession(user), cookieOptions);
+  const token = await createSession(user);
+  res.cookie('hermes_session', token, cookieOptions);
   await audit('admin_login_succeeded', req, user);
-  res.json({ user: publicUser(user) });
+  res.json({ user: publicUser(user), token });
 });
-
-async function registerUser(req, res) {
-  const { username, password } = credentials(req.body);
-  const code = String(req.body.inviteCode || '');
-  const invite = await db.prepare('SELECT * FROM invite_codes WHERE code_hash=? AND used_at IS NULL AND expires_at > ?').get(hash(code), new Date().toISOString());
-  if (!invite || !username || password.length < 12) return res.status(400).json({ error: 'Invalid registration or invite code' });
-  try {
-    const info = await db.transaction((tx) => {
-      const connection = tx || db;
-      const values = registrationValues(req.body);
-      const created = connection.prepare(`INSERT INTO users (username,password_hash,role,email,display_name) VALUES (?,?,?,?,?)${sqlReturningId()}`).run(username, passwordHash(password), 'user', values.email, values.displayName);
-      connection.prepare('UPDATE invite_codes SET used_at=? WHERE id=? AND used_at IS NULL').run(new Date().toISOString(), invite.id);
-      return created;
-    })();
-    const user = await db.prepare('SELECT * FROM users WHERE id=?').get(info.lastInsertRowid || info.id || info.rows?.[0]?.id);
-    await audit('user_registered', req, user);
-    res.status(201).json({ user: publicUser(user) });
-  } catch (error) {
-    console.error('Register user failed:', error);
-    res.status(409).json({ error: 'Username is already in use' });
-  }
-}
-router.post(['/users/register', '/user/register'], authLimiter, registerUser);
 
 async function loginUser(req, res) {
   const { username, password } = credentials(req.body);
-  const user = await db.prepare("SELECT * FROM users WHERE username=? AND role='user'").get(username);
+  const user = await db.prepare("SELECT * FROM users WHERE LOWER(username)=LOWER(?) AND role='user'").get(username);
   if (!user || !verifyPassword(password, user.password_hash)) { await audit('user_login_failed', req, user, { username }); return invalidLogin(res); }
-  res.cookie('hermes_session', await createSession(user), cookieOptions);
+  const token = await createSession(user);
+  res.cookie('hermes_session', token, cookieOptions);
   await audit('user_login_succeeded', req, user);
-  res.json({ user: publicUser(user) });
+  res.json({ user: publicUser(user), token });
 }
 router.post(['/users/login', '/user/login'], authLimiter, loginUser);
 
-async function createInvite(req, res) {
-  const code = randomCode();
-  const expiresAt = expires(Number(req.body.expiresInDays) || 7);
-  await db.prepare('INSERT INTO invite_codes (code_hash,created_by,expires_at) VALUES (?,?,?)').run(hash(code), req.user.id, expiresAt);
-  await audit('invite_created', req, req.user);
-  const invitedEmail = req.body.email ? String(req.body.email).trim() : null;
-  const adminEmail = config.gmail.sender || req.user.email;
+// Admin-created Delegated User Accounts CRUD
+router.get(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, res) => {
   try {
-    const emailed = await sendInvite(code, adminEmail, invitedEmail, expiresAt);
-    const invite = { deliveredByEmail: emailed, email: adminEmail, invitedEmail, expiresAt };
-    if (!configured && config.nodeEnv === 'development') invite.code = code;
-    res.status(201).json({ invite });
+    const rows = await db.prepare('SELECT id, username, role, role_title, permissions, email, display_name, must_change_password, created_at FROM users ORDER BY id ASC').all();
+    res.json({ users: rows.map(publicUser) });
   } catch (error) {
-    console.error('Invite email delivery failed:', {
-      code: error.code,
-      command: error.command,
-      responseCode: error.responseCode,
-      message: error.message
-    });
-    res.status(503).json({ error: 'Invite created but email delivery failed' });
+    console.error('List users failed:', error);
+    res.status(500).json({ error: 'Failed to retrieve user accounts' });
   }
-}
-router.post(['/admin/invites', '/invites'], requireAuth, requireAdmin, createInvite);
+});
 
-router.post('/admin/test-email', requireAuth, requireAdmin, async (req, res) => {
-  const recipient = config.gmail.sender || req.user.email;
-  if (!recipient) return res.status(400).json({ error: 'No administrator email is configured' });
+router.post(['/admin/users', '/users'], requireAuth, requireAdmin, async (req, res) => {
+  const username = String(req.body.username || req.body.email || '').trim();
+  const password = String(req.body.password || req.body.pin || '');
+  const roleTitle = String(req.body.roleTitle || req.body.role || 'Finance Secretary').trim();
+  const displayName = String(req.body.displayName || req.body.name || username).trim();
+  const email = req.body.email ? String(req.body.email).trim() : null;
+  const permissions = Array.isArray(req.body.permissions) ? req.body.permissions : ['Log Income & Tithes'];
+
+  if (!username) return res.status(400).json({ error: 'Username or email is required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Temporary password must be at least 8 characters' });
+
+  const existing = await db.prepare('SELECT 1 FROM users WHERE LOWER(username)=LOWER(?)').get(username);
+  if (existing) return res.status(409).json({ error: `Account with username/email "${username}" already exists` });
+
   try {
-    const sent = await sendInvite('GMAIL-API-TEST-DO-NOT-USE', recipient, 'Gmail API delivery test', new Date().toISOString());
-    if (!sent) return res.status(503).json({ error: 'Gmail API is not fully configured' });
-    res.json({ sent: true, email: recipient });
+    const info = await db.prepare(`
+      INSERT INTO users (username, password_hash, role, role_title, permissions, email, display_name, must_change_password)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)${sqlReturningId()}
+    `).run(
+      username,
+      passwordHash(password),
+      'user',
+      roleTitle,
+      JSON.stringify(permissions),
+      email,
+      displayName,
+      passwordChangeFlag(true)
+    );
+    const user = await db.prepare('SELECT * FROM users WHERE id=?').get(info.lastInsertRowid || info.id || info.rows?.[0]?.id);
+    await audit('delegated_user_created', req, req.user, { createdUserId: user.id, username, roleTitle });
+    res.status(201).json({ user: publicUser(user) });
   } catch (error) {
-    console.error('Gmail API test delivery failed:', {
-      code: error.code,
-      command: error.command,
-      responseCode: error.responseCode,
-      message: error.message
-    });
-    res.status(503).json({ error: 'Gmail API test delivery failed' });
+    console.error('Create delegated user failed:', error);
+    res.status(500).json({ error: error.message || 'Failed to create delegated user account' });
   }
+});
+
+router.delete(['/admin/users/:id', '/users/:id'], requireAuth, requireAdmin, async (req, res) => {
+  const targetId = Number(req.params.id);
+  if (!targetId) return res.status(400).json({ error: 'Invalid user ID' });
+  if (targetId === req.user.id) return res.status(400).json({ error: 'Cannot delete the active administrator account' });
+
+  const targetUser = await db.prepare('SELECT * FROM users WHERE id=?').get(targetId);
+  if (!targetUser) return res.status(404).json({ error: 'User not found' });
+  if (targetUser.role === 'admin') return res.status(403).json({ error: 'Cannot delete an administrator account' });
+
+  try {
+    await db.prepare('DELETE FROM users WHERE id=?').run(targetId);
+    await audit('delegated_user_deleted', req, req.user, { deletedUserId: targetId, username: targetUser.username });
+    res.json({ success: true, deletedId: targetId });
+  } catch (error) {
+    console.error('Delete user failed:', error);
+    res.status(500).json({ error: 'Failed to delete user account' });
+  }
+});
+
+router.post('/change-password', requireAuth, async (req, res) => {
+  const password = String(req.body.password || '');
+  if (password.length < 12) return res.status(400).json({ error: 'New password must be at least 12 characters' });
+  if (!req.user.must_change_password) return res.status(400).json({ error: 'A password change is not required for this account' });
+  const storedUser = await db.prepare('SELECT password_hash FROM users WHERE id=?').get(req.user.id);
+  if (storedUser && verifyPassword(password, storedUser.password_hash)) {
+    return res.status(400).json({ error: 'New password must be different from the temporary password' });
+  }
+  await db.prepare('UPDATE users SET password_hash=?, must_change_password=? WHERE id=?').run(passwordHash(password), passwordChangeFlag(false), req.user.id);
+  await audit('password_changed', req, req.user);
+  const user = await db.prepare('SELECT * FROM users WHERE id=?').get(req.user.id);
+  res.json({ user: publicUser(user) });
 });
 
 router.get('/me', requireAuth, async (req, res) => res.json({ user: publicUser(req.user) }));

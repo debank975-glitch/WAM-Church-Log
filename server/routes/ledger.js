@@ -1,11 +1,11 @@
 const express = require('express');
 const { db } = require('../auth');
-const { requireAuth } = require('../middleware');
+const { requireAuth, requirePasswordChanged } = require('../middleware');
 
 const router = express.Router();
 const MAX_STATE_BYTES = 2 * 1024 * 1024;
 
-router.get('/state', requireAuth, async (req, res) => {
+router.get('/state', requireAuth, requirePasswordChanged, async (req, res) => {
   const record = await db.prepare('SELECT state_json, updated_at FROM ledger_states WHERE user_id=?').get(req.user.id);
   if (!record) return res.json({ state: null });
   try {
@@ -15,7 +15,7 @@ router.get('/state', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/state', requireAuth, async (req, res) => {
+router.put('/state', requireAuth, requirePasswordChanged, async (req, res) => {
   const stateJson = JSON.stringify(req.body?.state);
   if (!req.body?.state || stateJson.length > MAX_STATE_BYTES) {
     return res.status(400).json({ error: 'Ledger state is missing or too large' });

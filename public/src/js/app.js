@@ -45,8 +45,8 @@ const DEFAULT_STATE = {
         variants: ['Sanctuary Sound Console', 'Harvest Goal Contributions', 'Community Food Drive']
       },
       {
-        name: 'Savings & Reserves',
-        variants: ['Savings Withdrawal', 'Reserve Transfer']
+        name: 'Savings',
+        variants: ['Savings Withdrawal', 'Savings Transfer']
       }
     ],
     EXPENSE: [
@@ -97,9 +97,9 @@ const DEFAULT_STATE = {
   savings: {
     totalBalance: 43500.00,
     history: [
-      { id: 'SAV-TX-1', date: '2026-09-01', type: 'DEPOSIT', amount: 1500.00, custody: 'Mobile Money Wallet', desc: 'Monthly operating surplus transfer' },
-      { id: 'SAV-TX-2', date: '2026-08-01', type: 'DEPOSIT', amount: 1200.00, custody: 'Mobile Money Wallet', desc: 'Surplus allocation' },
-      { id: 'SAV-TX-3', date: '2026-08-15', type: 'DEPOSIT', amount: 800.00, custody: 'Cash on Hand', desc: 'Emergency reserve contribution' }
+      { id: 'SAV-TX-1', date: '2026-09-01', type: 'DEPOSIT', amount: 1500.00, custody: 'Mobile Money Wallet', desc: 'Monthly savings transfer' },
+      { id: 'SAV-TX-2', date: '2026-08-01', type: 'DEPOSIT', amount: 1200.00, custody: 'Mobile Money Wallet', desc: 'Savings allocation' },
+      { id: 'SAV-TX-3', date: '2026-08-15', type: 'DEPOSIT', amount: 800.00, custody: 'Cash on Hand', desc: 'Emergency savings contribution' }
     ]
   },
   goals: [
@@ -536,15 +536,19 @@ function saveAppState() {
 // AUTHENTICATION & ACCESS CONTROL (Requirement 4 & 19)
 // -------------------------------------------------------------
 async function apiRequest(path, options = {}) {
+  const token = localStorage.getItem('hermes_token');
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   const response = await fetch(path, {
     credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers,
     ...options
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const publicAuthRoute = ['/api/auth/admin/login', '/api/auth/admin/setup', '/api/auth/user/login', '/api/auth/user/register'].includes(path);
-    if (response.status === 401 && !publicAuthRoute) {
+    const isUserManagement = path.includes('/api/auth/users') || path.includes('/api/auth/admin/users');
+    const publicAuthRoute = ['/api/auth/admin/login', '/api/auth/admin/setup', '/api/auth/user/login'].includes(path);
+    if (response.status === 401 && !publicAuthRoute && !isUserManagement) {
       window.location.replace('/auth.html?reason=session-expired');
     }
     throw new Error(payload.error || 'Request failed');
@@ -567,8 +571,7 @@ function showAuthPanel(panel) {
   const panels = {
     admin: 'adminLoginForm',
     adminSetup: 'adminSetupForm',
-    user: 'userLoginForm',
-    userRegister: 'userRegisterForm'
+    user: 'userLoginForm'
   };
   Object.values(panels).forEach(id => document.getElementById(id)?.classList.add('hidden'));
   document.getElementById(panels[panel] || panels.admin)?.classList.remove('hidden');
@@ -596,13 +599,14 @@ async function hydrateLedgerState() {
   ledgerHydrated = true;
 }
 
-async function setAuthenticatedUser(user) {
+async function setAuthenticatedUser(user, token) {
+  if (token) localStorage.setItem('hermes_token', token);
   const isAdmin = user.role === 'admin' || user.role === 'Administrator' || user.isAdmin === true;
   appState.currentUser = {
     id: user.id,
     name: user.displayName || user.name || user.username,
     username: user.username,
-    role: isAdmin ? 'Administrator' : (user.role || 'User'),
+    role: isAdmin ? 'Administrator' : (user.roleTitle || user.role || 'User'),
     isAdmin,
     permissions: isAdmin
       ? ['home', 'quota', 'tithe', 'savings', 'goals', 'charts', 'editUsers']
@@ -615,6 +619,9 @@ async function setAuthenticatedUser(user) {
     ledgerHydrated = true;
   }
   updateUserUI();
+  if (isAdmin) {
+    loadServerUsers().catch(() => {});
+  }
   renderCurrentPage();
 }
 
@@ -622,7 +629,7 @@ async function setupUserSession() {
   try {
     const payload = await apiRequest('/api/auth/me');
     if (payload.user) {
-      await setAuthenticatedUser(payload.user);
+      await setAuthenticatedUser(payload.user, payload.token);
       return;
     }
   } catch (error) {
@@ -698,31 +705,12 @@ async function handleAdminSetup(event) {
   }
 }
 
-async function handleUserRegister(event) {
-  event.preventDefault();
-  try {
-    const payload = await apiRequest('/api/auth/user/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: document.getElementById('userRegisterUsername').value.trim(),
-        displayName: document.getElementById('userRegisterName').value.trim(),
-        email: document.getElementById('userRegisterEmail').value.trim(),
-        password: document.getElementById('userRegisterPassword').value,
-        inviteCode: document.getElementById('userRegisterCode').value
-      })
-    });
-    await setAuthenticatedUser(payload.user);
-    event.currentTarget.reset();
-  } catch (error) {
-    showAuthMessage(error.message);
-  }
-}
-
 function handleSignOut() {
   showConfirmation(
     'Sign Out',
     'Are you sure you want to sign out and lock the financial ledger?',
     () => {
+      localStorage.removeItem('hermes_token');
       apiRequest('/api/auth/logout', { method: 'POST' })
         .catch(error => console.warn('Sign out request failed:', error.message))
         .finally(() => {
@@ -749,6 +737,9 @@ function navigateTo(pageId) {
 
   activePage = pageId;
   if (window.matchMedia('(max-width: 767px)').matches) closeSidebar();
+  if (pageId === 'editUsers') {
+    loadServerUsers().catch(() => {});
+  }
 
   // Toggle page visibility
   document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
@@ -963,7 +954,7 @@ function renderHomeMetrics() {
   const subtextInterval = appState.currentInterval.toUpperCase();
   document.getElementById('cardIncomeSubtext').innerText = `${subtextInterval} total income`;
   document.getElementById('cardExpenseSubtext').innerText = `${subtextInterval} total expenditure`;
-  document.getElementById('cardBalanceSubtext').innerText = `${subtextInterval} operating reserve`;
+  document.getElementById('cardBalanceSubtext').innerText = `${subtextInterval} savings`;
 }
 
 // -------------------------------------------------------------
@@ -1779,9 +1770,9 @@ function handleSavingsWithdrawSubmit(e) {
       savingsRecordId,
       type: 'INCOME',
       date: new Date().toISOString().split('T')[0],
-      category: 'Savings & Reserves',
+      category: 'Savings',
       variant: 'Savings Withdrawal',
-      entity: 'Church Savings Reserve',
+      entity: 'Church Savings Account',
       amount,
       custody,
       description: desc,
@@ -1844,9 +1835,9 @@ function handleEditSavingsRecordSubmit(e) {
         savingsRecordId: id,
         type: 'INCOME',
         date: updated.date,
-        category: 'Savings & Reserves',
+        category: 'Savings',
         variant: 'Savings Withdrawal',
-        entity: 'Church Savings Reserve',
+        entity: 'Church Savings Account',
         amount: updated.amount,
         custody: updated.custody,
         description: updated.desc,
@@ -2170,10 +2161,36 @@ function handleGoalSubmit(e) {
 // -------------------------------------------------------------
 // USER ROLES & DELEGATED ACCOUNTS (Requirement 4 & 19)
 // -------------------------------------------------------------
+async function loadServerUsers() {
+  if (!appState.currentUser?.isAdmin) return;
+  try {
+    const payload = await apiRequest('/api/auth/admin/users');
+    if (Array.isArray(payload.users)) {
+      appState.users = payload.users.map(u => ({
+        id: u.id,
+        name: u.displayName || u.username,
+        username: u.username,
+        role: u.roleTitle || (u.role === 'admin' ? 'Lead Admin' : 'Delegated'),
+        isAdmin: u.role === 'admin',
+        permissions: u.permissions || [],
+        email: u.email || ''
+      }));
+      renderUsersTable();
+    }
+  } catch (err) {
+    console.warn('Unable to load server users:', err.message);
+  }
+}
+
 function renderUsersTable() {
   const tbody = document.getElementById('usersTableBody');
   if (!tbody) return;
   tbody.innerHTML = '';
+
+  if (!appState.users || appState.users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No delegated accounts registered yet. Use "Create Delegated Account" above.</td></tr>`;
+    return;
+  }
 
   appState.users.forEach(u => {
     const tr = document.createElement('tr');
@@ -2184,18 +2201,21 @@ function renderUsersTable() {
     ).join(' ');
 
     tr.innerHTML = `
-      <td class="py-3 px-4 font-bold text-slate-900">${u.name}</td>
+      <td class="py-3 px-4 font-bold text-slate-900">
+        <div>${u.name}</div>
+        <div class="text-[11px] text-slate-400 font-normal font-mono">@${u.username}${u.email ? ` • ${u.email}` : ''}</div>
+      </td>
       <td class="py-3 px-4 text-slate-700 font-semibold">${u.role}</td>
-      <td class="py-3 px-4 space-x-1">${permissionsBadges || '-'}</td>
+      <td class="py-3 px-4 space-x-1">${permissionsBadges || '<span class="text-slate-400 text-[10px]">Standard Ledger Access</span>'}</td>
       <td class="py-3 px-4 font-mono text-slate-500">••••</td>
       <td class="py-3 px-4">
         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.isAdmin ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">
-          ${u.isAdmin ? 'Lead Admin' : 'Delegated'}
+          ${u.isAdmin ? 'Lead Admin' : 'Active Delegated'}
         </span>
       </td>
       <td class="py-3 px-4 text-center">
         ${u.isAdmin ? '<span class="text-[10px] text-slate-400">Master</span>' : `
-          <button onclick="deleteUserAccount('${u.id}')" class="p-1 text-slate-400 hover:text-rose-600">
+          <button onclick="deleteUserAccount('${u.id}')" title="Revoke account access" class="p-1 text-slate-400 hover:text-rose-600 transition">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         `}
@@ -2206,57 +2226,80 @@ function renderUsersTable() {
   lucide.createIcons();
 }
 
-function handleCreateUserSubmit(e) {
+async function handleCreateUserSubmit(e) {
   e.preventDefault();
-  const email = document.getElementById('userNewEmail').value.trim();
-  const role = document.getElementById('userNewRole').value;
-  if (!email) {
-    alert('Please enter the user email.');
+  const alertEl = document.getElementById('userCreateAlert');
+  if (alertEl) alertEl.classList.add('hidden');
+
+  const name = document.getElementById('userNewName')?.value.trim();
+  const username = document.getElementById('userNewUsername')?.value.trim();
+  const roleTitle = document.getElementById('userNewRole')?.value;
+  const pin = document.getElementById('userNewPin')?.value;
+  const email = document.getElementById('userNewEmail')?.value.trim();
+
+  if (!name || !username || !pin || pin.length < 8) {
+    if (alertEl) {
+      alertEl.textContent = 'Please fill in Officer Name, Username / Login ID, and a temporary password of at least 8 characters.';
+      alertEl.classList.remove('hidden');
+    } else {
+      alert('Please fill in Officer Name, Username / Login ID, and a temporary password of at least 8 characters.');
+    }
     return;
   }
 
-  showConfirmation(
-    'Generate User Invitation',
-    `Generate a one-time ${role} invitation for ${email}?`,
-    async () => {
-      try {
-        const payload = await apiRequest('/api/auth/invites', {
-          method: 'POST',
-          body: JSON.stringify({ email, role })
-        });
-        closeModal('modalCreateUser');
-        e.target.reset();
-        renderUsersTable();
-        const message = payload.invite?.deliveredByEmail
-          ? `Invitation code sent to the administrator email${payload.invite?.email ? ` (${payload.invite.email})` : ''}.`
-          : `Invitation created. Share this code securely: ${payload.invite?.code || 'check the server delivery configuration'}`;
-        alert(message);
-      } catch (error) {
-        alert(error.message);
-      }
+  const permissions = [];
+  if (document.getElementById('permLogIncome')?.checked) permissions.push('Log Income & Tithes');
+  if (document.getElementById('permLogExpense')?.checked) permissions.push('Log Expenditure');
+  if (document.getElementById('permPrintReports')?.checked) permissions.push('Print Official Reports');
 
-    }
-  );
-}
+  const btn = document.getElementById('btnSubmitUser');
+  if (btn) btn.disabled = true;
 
-async function sendTestEmail() {
   try {
-    const payload = await apiRequest('/api/auth/admin/test-email', { method: 'POST' });
-    alert(`Test email sent to ${payload.email} through Gmail API. Check the inbox and spam folder.`);
+    const payload = await apiRequest('/api/auth/admin/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        displayName: name,
+        username,
+        password: pin,
+        roleTitle,
+        email: email || null,
+        permissions
+      })
+    });
+
+    closeModal('modalCreateUser');
+    e.target.reset();
+    await loadServerUsers();
+    alert(`Delegated account created successfully for ${payload.user?.displayName || name} (${roleTitle}).`);
   } catch (error) {
-    alert(error.message);
+    // Show error directly in modal without logging the admin out of the homepage
+    if (alertEl) {
+      alertEl.textContent = `Could not create account: ${error.message}`;
+      alertEl.classList.remove('hidden');
+    } else {
+      alert(`Could not create account: ${error.message}`);
+    }
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 function deleteUserAccount(userId) {
-  const u = appState.users.find(user => user.id === userId);
+  const u = appState.users.find(user => String(user.id) === String(userId));
   if (!u) return;
 
   showConfirmation(
     'Revoke Delegated Account',
-    `Revoke access credentials for ${u.name}?`,
-    () => {
-      alert('User account revocation is managed by the server and is not available in this prototype screen yet.');
+    `Revoke access credentials for ${u.name} (${u.role})?`,
+    async () => {
+      try {
+        await apiRequest(`/api/auth/admin/users/${userId}`, { method: 'DELETE' });
+        await loadServerUsers();
+        alert(`Account for ${u.name} has been revoked.`);
+      } catch (error) {
+        alert(`Failed to revoke account: ${error.message}`);
+      }
     },
     'rose'
   );
@@ -2332,7 +2375,7 @@ function renderPrintableReport() {
         <span class="text-xl font-black text-rose-700 font-mono">${formatUSD(totalExpenses)}</span>
       </div>
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-        <span class="text-xs text-slate-500 uppercase font-bold block">Net Operating Reserve</span>
+        <span class="text-xs text-slate-500 uppercase font-bold block">Net Savings</span>
         <span class="text-xl font-black ${netBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'} font-mono">${formatUSD(netBalance)}</span>
       </div>
     </div>

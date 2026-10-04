@@ -8,6 +8,9 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
   email TEXT,
   display_name TEXT,
+  role_title TEXT,
+  permissions TEXT,
+  must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

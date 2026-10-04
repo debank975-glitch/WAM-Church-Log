@@ -3,14 +3,17 @@
     admin: 'adminLoginForm',
     adminSetup: 'adminSetupForm',
     user: 'userLoginForm',
-    userRegister: 'userRegisterForm'
+    passwordChange: 'passwordChangeForm'
   };
   const message = document.getElementById('authMessage');
 
   async function apiRequest(path, options = {}) {
+    const token = localStorage.getItem('hermes_token');
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const response = await fetch(path, {
       credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      headers,
       ...options
     });
     const payload = await response.json().catch(() => ({}));
@@ -35,8 +38,10 @@
     Object.values(panels).forEach(id => document.getElementById(id).classList.add('hidden'));
     document.getElementById(panels[panel] || panels.admin).classList.remove('hidden');
     const isAdmin = panel.startsWith('admin');
+    const isPasswordChange = panel === 'passwordChange';
     document.getElementById('adminTab').classList.toggle('active', isAdmin);
     document.getElementById('userTab').classList.toggle('active', !isAdmin);
+    document.querySelector('.auth-tabs').classList.toggle('hidden', isPasswordChange);
     document.getElementById('adminTab').setAttribute('aria-selected', String(isAdmin));
     document.getElementById('userTab').setAttribute('aria-selected', String(!isAdmin));
     message.className = 'message hidden';
@@ -50,8 +55,13 @@
 
   function setAuthenticatedUser(payload, form) {
     if (!payload.user) throw new Error('Authentication response was incomplete');
+    if (payload.token) localStorage.setItem('hermes_token', payload.token);
     form.reset();
-    window.location.assign('/');
+    if (payload.user.mustChangePassword) {
+      showPanel('passwordChange');
+    } else {
+      window.location.assign('/');
+    }
   }
 
   async function submitForm(event, path, fields) {
@@ -86,15 +96,47 @@
     password: document.getElementById('adminSetupPassword').value,
     setupCode: document.getElementById('adminSetupCode').value
   }));
-  document.getElementById('userRegisterForm').addEventListener('submit', event => submitForm(event, '/api/auth/user/register', {
-    username: document.getElementById('userRegisterUsername').value.trim(),
-    displayName: document.getElementById('userRegisterName').value.trim(),
-    email: document.getElementById('userRegisterEmail').value.trim(),
-    password: document.getElementById('userRegisterPassword').value,
-    inviteCode: document.getElementById('userRegisterCode').value
-  }));
+  document.getElementById('passwordChangeForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const password = document.getElementById('newPassword').value;
+    const confirmation = document.getElementById('confirmNewPassword').value;
+    if (password !== confirmation) {
+      showMessage('The new passwords do not match.');
+      return;
+    }
+    const form = event.currentTarget;
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+      await apiRequest('/api/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ password })
+      });
+      form.reset();
+      window.location.assign('/');
+    } catch (error) {
+      showMessage(error.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
 
-  apiRequest('/api/auth/me').then(payload => {
-    if (payload.user) window.location.replace('/');
+    // Password visibility toggles
+    document.querySelectorAll('.password-toggle').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.dataset.target;
+        const input = document.getElementById(targetId);
+        if (input) {
+          const isPassword = input.type === 'password';
+          input.type = isPassword ? 'text' : 'password';
+          button.textContent = isPassword ? 'Hide' : 'Show';
+          button.setAttribute('aria-label', isPassword ? 'Hide value' : 'Show value');
+        }
+      });
+    });
+
+    apiRequest('/api/auth/me').then(payload => {
+    if (payload.user?.mustChangePassword) showPanel('passwordChange');
+    else if (payload.user) window.location.replace('/');
   }).catch(() => {});
 })();

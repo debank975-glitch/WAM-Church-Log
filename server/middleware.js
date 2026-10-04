@@ -23,4 +23,9 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-module.exports = { rateLimit, requireAuth, requireAdmin };
+function requirePasswordChanged(req, res, next) {
+  if (req.user?.must_change_password) return res.status(403).json({ error: 'Password change required before accessing the ledger' });
+  next();
+}
+
+module.exports = { rateLimit, requireAuth, requireAdmin, requirePasswordChanged };

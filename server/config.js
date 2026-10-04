@@ -9,6 +9,7 @@ const required = (name) => {
 
 const config = {
   root,
+  publicRoot: path.join(root, 'public'),
   port: Number(process.env.PORT || 3000),
   nodeEnv: process.env.NODE_ENV || 'development',
   databaseProvider: String(process.env.DATABASE_PROVIDER || 'sqlite').toLowerCase(),

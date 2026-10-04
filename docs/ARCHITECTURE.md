@@ -11,7 +11,7 @@ The project is a single-page financial client backed by an Express API. Its sour
 ├── server/
 │   ├── auth/               # Password hashing and session/token services
 │   ├── db.js               # SQLite/PostgreSQL provider and schema initialization
-│   ├── routes/              # Authentication and invitation API routes
+│   ├── routes/              # Authentication and delegated-account API routes
 │   └── index.js            # HTTP server and static frontend hosting
 ├── assets/                 # Static images and other public assets
 ├── docs/                   # Architecture and security documentation
@@ -22,7 +22,7 @@ The existing single-page behavior is intentionally preserved while authenticated
 
 ## Authentication flow
 
-The browser uses two distinct login paths: administrator login and user login. The first administrator must provide `ADMIN_SETUP_CODE`; the API enforces that only one administrator can ever be created. After login, the server issues a random session token stored in an HTTP-only cookie. The administrator can generate a one-time, expiring invitation code for a user; invitation codes and passwords are stored only as salted, slow hashes. Production deployments should configure Gmail API OAuth so invitation codes are delivered by email instead of returned by the API.
+The browser uses two distinct login paths: administrator login and user login. The first administrator must provide `ADMIN_SETUP_CODE`; the API enforces that only one administrator can ever be created. An administrator creates delegated accounts directly with a temporary password. After login, the server issues a random session token stored in an HTTP-only cookie, and the delegated user must replace the temporary password before ledger routes become available.
 
 ## Production target
 

@@ -6,8 +6,8 @@ A web-based Church Financial Log and accounting portal designed for transparency
 
 1. **Multi-Interval Tracking**: Seamlessly switch between **Monthly**, **Quarterly**, and **Yearly** views from the top navigation bar.
 2. **Budget Quota Alert**: Live visual quota indicator and warning banner alerting you whether church spending is **Within Budget**, **Approaching Limit**, or **OVER QUOTA**.
-3. **Master Financial Balance**: Immediate tracking of **Total Income**, **Total Expenses**, and **Net Reserve Balance**.
-4. **Restricted Access & Delegated Accounts**: Server-backed administrator and user authentication. The single administrator is bootstrapped with a one-time setup code, and user accounts are created with one-time invitation codes issued by the administrator.
+3. **Master Financial Balance**: Immediate tracking of **Total Income**, **Total Expenses**, and **Savings Balance**.
+4. **Restricted Access & Delegated Accounts**: Server-backed administrator and user authentication. The single administrator is bootstrapped with a one-time setup code. Administrators create delegated accounts directly with a temporary password; the user must replace it before accessing the ledger.
 5. **Printable Report Sheet**: One-click official statement for the month, quarter, or year with church letterhead, custody reconciliation, category tables, and trustee sign-off lines.
 6. **Pie Charts**: Visual representation of income sources and expenditure departments using interactive Pie Charts.
 7. **Custom Category Management**: Add custom major income and expense categories at any time.
@@ -21,13 +21,13 @@ A web-based Church Financial Log and accounting portal designed for transparency
 16. **Detailed Descriptions**: Required description field on income and expenditure entries (does not apply to the tithe page).
 17. **Calendar-Style Tithe Grid**: Rounded date boxes with the dates of the current month displayed under them. Tapping any box opens that day's payer list and allows multiple tithe entries to be added before saving them to the general ledger.
 18. **Sidebar Navigation**: Responsive left sidebar containing user status, quota gauge, and quick navigation.
-19. **All Required Pages**:
+19. **Role-specific pages**:
     - **Home Page**
     - **Budget Page**
     - **Tithe Page**
     - **Savings Page**
     - **Goals Page**
-    - **Edit Users**
+    - **Edit Users** (administrator page only)
     - **Sign Out**
 
 ## How to Run
@@ -58,7 +58,7 @@ Existing local SQLite data is not automatically migrated to PostgreSQL. Export o
 2. Create a free Render Web Service from this repository. Render can use the included `render.yaml`.
 3. Set `DATABASE_URL` to the Supabase connection string and keep `DATABASE_PROVIDER=postgres`.
 4. Add strong random values for `SESSION_SECRET` and `ADMIN_SETUP_CODE`.
-5. Add the Gmail API OAuth variables if invitation email delivery is required.
+5. Gmail API OAuth is optional and is not required for delegated-account creation.
 6. Deploy and open the Render-provided `https://*.onrender.com/auth.html` URL.
 
 The free Render service may sleep when idle, and Supabase free projects have usage and inactivity limits. Keep regular database backups before using the site for official financial records.
@@ -67,15 +67,16 @@ The free Render service may sleep when idle, and Supabase free projects have usa
 
 The prototype is organized so the current browser client can grow into a maintainable production application:
 
-- `index.html` - application shell and page markup
-- `auth.html` - standalone sign-up and login page
-- `src/js/app.js` - current application behavior and state transitions
-- `src/js/auth.js` - standalone authentication page behavior
-- `src/css/styles.css` - custom application styles
-- `src/css/auth.css` - standalone authentication page styles
+- `public/admin.html` - administrator dashboard, including delegated account management
+- `public/user.html` - team member dashboard without the Edit Users page
+- `public/auth.html` - standalone sign-up and login page
+- `public/src/js/app.js` - current application behavior and state transitions
+- `public/src/js/auth.js` - standalone authentication page behavior
+- `public/src/css/styles.css` - custom application styles
+- `public/src/css/auth.css` - standalone authentication page styles
 - `server/` - auth API, persistence abstraction, sessions, email delivery, and audit logging
 - `supabase/schema.sql` - PostgreSQL schema for deployment-ready auth/session/audit/ledger tables
-- `assets/` - static images and other public assets
+- `public/assets/` - static images and other public assets
 - `docs/ARCHITECTURE.md` - target architecture and production boundaries
 - `docs/SECURITY.md` - security improvements and prototype limitations
 

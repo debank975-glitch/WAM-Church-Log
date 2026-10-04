@@ -60,6 +60,7 @@ function sqliteDb() {
       role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
       email TEXT,
       display_name TEXT,
+      must_change_password INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS invite_codes (
@@ -97,6 +98,15 @@ function sqliteDb() {
   try { db.exec('ALTER TABLE users ADD COLUMN display_name TEXT'); } catch (error) {
     if (!String(error.message).includes('duplicate column name')) throw error;
   }
+  try { db.exec('ALTER TABLE users ADD COLUMN role_title TEXT'); } catch (error) {
+    if (!String(error.message).includes('duplicate column name')) throw error;
+  }
+  try { db.exec('ALTER TABLE users ADD COLUMN permissions TEXT'); } catch (error) {
+    if (!String(error.message).includes('duplicate column name')) throw error;
+  }
+  try { db.exec('ALTER TABLE users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0'); } catch (error) {
+    if (!String(error.message).includes('duplicate column name')) throw error;
+  }
 
   db.ready = Promise.resolve();
   return db;
@@ -116,16 +126,25 @@ function postgresDb() {
   const ensureSchema = async () => {
     const client = await pool.connect();
     try {
+      await client.query('CREATE EXTENSION IF NOT EXISTS citext;');
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id BIGSERIAL PRIMARY KEY,
-          username TEXT NOT NULL UNIQUE,
+          username CITEXT NOT NULL UNIQUE,
           password_hash TEXT NOT NULL,
           role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
           email TEXT,
           display_name TEXT,
+          role_title TEXT,
+          permissions TEXT,
+          must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
+
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS role_title TEXT;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS permissions TEXT;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT FALSE;
 
         CREATE TABLE IF NOT EXISTS invite_codes (
           id BIGSERIAL PRIMARY KEY,

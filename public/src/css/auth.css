@@ -37,6 +37,10 @@ body {
 .auth-form label { display: grid; gap: .45rem; color: #43545d; font-size: .72rem; font-weight: 700; }
 .auth-form input { width: 100%; padding: .85rem .9rem; border: 1px solid var(--line); border-radius: .7rem; outline: 0; color: var(--ink); background: #fbfcfb; font: inherit; font-size: .85rem; }
 .auth-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,123,86,.12); }
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 2.8rem; }
+.password-toggle { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 800; padding: .25rem; color: var(--muted); }
+.password-toggle:hover { color: var(--ink); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
 .primary-button { display: flex; align-items: center; justify-content: space-between; margin-top: .25rem; padding: .9rem 1rem; border: 0; border-radius: .7rem; background: var(--green-dark); color: #fff; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 800; }
 .primary-button:hover { background: var(--green); }

@@ -25,7 +25,7 @@ function createMessage(recipient, invitedEmail, code, expiresAt) {
     '',
     `Invitee email: ${invitedEmail || 'Not provided'}`,
     `One-time invitation code: ${code}`,
-    `Expires: ${expiresAt}`,
+    `Expires: ${expiresAt} (Valid for 30 minutes)`,
     '',
     'Share this code securely with the invited person. It can be used only once.'
   ].join('\n');
@@ -33,7 +33,7 @@ function createMessage(recipient, invitedEmail, code, expiresAt) {
     <p>A new Hermes team member invitation was created.</p>
     <p><strong>Invitee email:</strong> ${escapeHtml(invitedEmail || 'Not provided')}<br>
     <strong>One-time invitation code:</strong> <code>${escapeHtml(code)}</code><br>
-    <strong>Expires:</strong> ${escapeHtml(expiresAt)}</p>
+    <strong>Expires:</strong> ${escapeHtml(expiresAt)} <em>(Valid for 30 minutes)</em></p>
     <p>Share this code securely with the invited person. It can be used only once.</p>
   `;
   return [
